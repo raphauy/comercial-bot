@@ -12,10 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter"
   
 interface DataTableToolbarProps<TData> {
-  table: TanstackTable<TData>;
+  table: TanstackTable<TData>
+  vendors: string[]
 }
 
-export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
+export function DataTableToolbar<TData>({ table, vendors }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -27,18 +28,30 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
           options={["U$S", "$"]}
         />
       )}
+      {table.getColumn("vendor")  && (
+        <DataTableFacetedFilter
+          column={table.getColumn("vendor")}
+          title="Vendedor"
+          options={vendors}
+        />
+      )}
         
       <Input className="max-w-xs" placeholder="filtrar por Id (Ranking)"
           value={(table.getColumn("externalId")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("externalId")?.setFilterValue(event.target.value)}                
       />
-          
-      
+
+      <Input className="max-w-xs" placeholder="filtrar por producto"
+          value={(table.getColumn("productName")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("productName")?.setFilterValue(event.target.value)}                
+      />
+            
       <Input className="max-w-xs" placeholder="filtrar por cliente"
           value={(table.getColumn("comClient")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("comClient")?.setFilterValue(event.target.value)}                
       />
-      
+
+
       {isFiltered && (
         <Button
           variant="ghost"
@@ -58,6 +71,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   columnsOff?: string[]
   subject: string
+  vendors: string[]
 }
 
 export function DataTable<TData, TValue>({
@@ -65,6 +79,7 @@ export function DataTable<TData, TValue>({
   data,
   columnsOff,
   subject,
+  vendors,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -104,7 +119,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4 dark:text-white">
-      <DataTableToolbar table={table}/>
+      <DataTableToolbar table={table} vendors={vendors}/>
       <div className="border rounded-md">
         <Table>
           <TableHeader>

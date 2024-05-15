@@ -298,7 +298,10 @@ model ComClient {
 
   sells           Sell[]                            // gennext: skip.list
   vendors         Vendor[]                          // gennext: skip.list
-  
+
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
+
   @@unique([clientId, code])
 }
 
@@ -316,6 +319,9 @@ model Sell {
 
   vendor        Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId      String
+
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
 
   @@unique([comClientId, currency, productId, vendorId])
 }
@@ -337,6 +343,9 @@ model Product {
 
   sells           Sell[]                            // gennext: skip.list
 
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
+
   @@unique([clientId, externalId])
 }
 
@@ -344,7 +353,10 @@ model Vendor {
   id              String    @id @default(cuid())
   name            String                            // gennext: show.column
   sells           Sell[]                            // gennext: skip.
-  
+
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
+
   comClient       ComClient @relation(fields: [comClientId], references: [id], onDelete: Cascade)
   comClientId     String
 }
@@ -353,6 +365,9 @@ model Category {
   id              String    @id @default(cuid())
   name            String                            // gennext: show.column
   products        Product[]                         // gennext: skip.list
+
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
 
   client          Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId        String

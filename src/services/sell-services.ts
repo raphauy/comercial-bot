@@ -15,6 +15,8 @@ export type SellDAO = {
 	productId: string
 	vendor: VendorDAO
 	vendorId: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const sellSchema = z.object({

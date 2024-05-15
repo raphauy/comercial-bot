@@ -17,7 +17,7 @@ export default async function VendorPage({ params }: Props) {
       <h1 className="text-3xl font-bold text-center">Vendedores</h1>
 
       <div className="container p-3 py-4 mx-auto bg-white border rounded-md text-muted-foreground dark:text-white">
-        <DataTable columns={columns} data={data} subject="Vendor"/>      
+        <DataTable columns={columns} data={data} subject="Vendor" />
       </div>
     </div>
   )

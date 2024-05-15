@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button"
 import { SellDAO } from "@/services/sell-services"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import { DeleteSellDialog, SellDialog } from "./sell-dialogs"
 import { ComClientDAO } from "@/services/comclient-services"
+import { es } from "date-fns/locale"
+import { VendorDAO } from "@/services/vendor-services"
+import { ProductDAO } from "@/services/product-services"
 
 
 export const columns: ColumnDef<SellDAO>[] = [
@@ -47,6 +50,10 @@ export const columns: ColumnDef<SellDAO>[] = [
         <p className="font-bold">{data.product.name}</p>
       )
     },
+    filterFn: (row, id, value) => {
+      const product: ProductDAO= row.original.product
+      return product.name.toLowerCase().includes(value.toLowerCase())
+    },
   },
 
   {
@@ -62,10 +69,9 @@ export const columns: ColumnDef<SellDAO>[] = [
     cell: ({ row }) => {
       const data= row.original
       return (
-        <div>
+        <div className="min-w-[150px]">
           <p className="font-bold">{data.comClient.name}</p>
-          <p>{data.comClient.code}</p>
-          <p>{data.currency}</p>
+          <p>{data.comClient.code} - {data.currency}</p>
         </div>
       )
     },
@@ -76,6 +82,29 @@ export const columns: ColumnDef<SellDAO>[] = [
         client.name.toLowerCase().includes(value.toLowerCase())
         
       return filter
+    },
+  },
+
+  {
+    accessorKey: "vendor",
+    header: ({ column }) => {
+        return (
+          <Button variant="ghost" className="pl-0 dark:text-white"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Vendedor
+            <ArrowUpDown className="w-4 h-4 ml-1" />
+          </Button>
+    )},
+    cell: ({ row }) => {
+      const data= row.original
+      return (
+        <p>{data.vendor.name}</p>
+      )
+    },
+    filterFn: (row, id, value) => {
+      const vendor: VendorDAO= row.getValue(id)
+
+      return value.includes(vendor.name)
     },
   },
 
@@ -97,6 +126,33 @@ export const columns: ColumnDef<SellDAO>[] = [
         </div>
       )
     },
+  },
+
+  {
+    accessorKey: "currency",
+    header: ({ column }) => {
+        return null
+    },
+    cell: ({ row }) => {
+      const data= row.original
+      return null
+    },
+  },
+
+  {
+    accessorKey: "UpdatedAt",
+    header: ({ column }) => {
+        return (
+          <Button variant="ghost" className="pl-0 dark:text-white"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Actualizado
+            <ArrowUpDown className="w-4 h-4 ml-1" />
+          </Button>
+    )},
+		cell: ({ row }) => {
+      const data= row.original
+      return (<p>{formatDistanceToNow(data.updatedAt, {locale: es})}</p>) 
+    }
   },
 
   {

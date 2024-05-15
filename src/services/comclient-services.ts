@@ -10,6 +10,8 @@ export type ComClientDAO = {
 	direccion: string | undefined
 	telefono: string | undefined
 	clientId: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const comClientSchema = z.object({

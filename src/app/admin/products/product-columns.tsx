@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button"
 import { ProductDAO } from "@/services/product-services"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import { DeleteProductDialog, ProductDialog } from "./product-dialogs"
 import { formatCurrency } from "@/lib/utils"
+import { es } from "date-fns/locale"
 
 
 export const columns: ColumnDef<ProductDAO>[] = [
@@ -15,16 +16,16 @@ export const columns: ColumnDef<ProductDAO>[] = [
     accessorKey: "externalId",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" className="pl-0 dark:text-white min-w-[170px]"
+        <Button variant="ghost" className="pl-0 dark:text-white min-w-[115px]"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Producto (Ranking)
+          Id (Ranking)
           <ArrowUpDown className="w-4 h-4 ml-1" />
         </Button>
   )},
   cell: ({ row }) => {
     const data= row.original
     return (
-      <div className="w-16">
+      <div className="w-12">
         <p className="font-bold text-right">{data.externalId}</p>
       </div>
     )
@@ -122,7 +123,23 @@ export const columns: ColumnDef<ProductDAO>[] = [
       filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-},
+  },
+
+  {
+    accessorKey: "UpdatedAt",
+    header: ({ column }) => {
+        return (
+          <Button variant="ghost" className="pl-0 dark:text-white"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Actualizado
+            <ArrowUpDown className="w-4 h-4 ml-1" />
+          </Button>
+    )},
+		cell: ({ row }) => {
+      const data= row.original
+      return (<p>{formatDistanceToNow(data.updatedAt, {locale: es})}</p>) 
+    }
+  },
 
   {
     id: "actions",

@@ -14,7 +14,9 @@ export type ProductDAO = {
 	category: CategoryDAO
 	categoryId: string
   categoryName: string
-  clientId: string
+  clientId: string  
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const productSchema = z.object({

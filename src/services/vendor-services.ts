@@ -5,6 +5,8 @@ export type VendorDAO = {
 	id: string
 	name: string
   comClientId: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const vendorSchema = z.object({

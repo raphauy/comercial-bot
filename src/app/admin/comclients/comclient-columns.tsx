@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button"
 import { ComClientDAO } from "@/services/comclient-services"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Phone } from "lucide-react"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import { DeleteComClientDialog, ComClientDialog } from "./comclient-dialogs"
+import { es } from "date-fns/locale"
 
 
 export const columns: ColumnDef<ComClientDAO>[] = [
@@ -95,6 +96,22 @@ export const columns: ColumnDef<ComClientDAO>[] = [
         </div>
       )
     },
+  },
+
+  {
+    accessorKey: "UpdatedAt",
+    header: ({ column }) => {
+        return (
+          <Button variant="ghost" className="pl-0 dark:text-white"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Actualizado
+            <ArrowUpDown className="w-4 h-4 ml-1" />
+          </Button>
+    )},
+		cell: ({ row }) => {
+      const data= row.original
+      return (<p>{formatDistanceToNow(data.updatedAt, {locale: es})}</p>) 
+    }
   },
 
   {
