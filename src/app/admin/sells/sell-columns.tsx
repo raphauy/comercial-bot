@@ -17,16 +17,34 @@ export const columns: ColumnDef<SellDAO>[] = [
         return (
           <Button variant="ghost" className="pl-0 dark:text-white"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            ProdId (Ranking)
+            Id (Ranking)
             <ArrowUpDown className="w-4 h-4 ml-1" />
           </Button>
     )},
     cell: ({ row }) => {
       const data= row.original
       return (
-        <div className="w-16">
+        <div className="w-12">
           <p className="font-bold text-right">{data.externalId}</p>
         </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "productName",
+    header: ({ column }) => {
+        return (
+          <Button variant="ghost" className="pl-0 dark:text-white"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Producto
+            <ArrowUpDown className="w-4 h-4 ml-1" />
+          </Button>
+    )},
+    cell: ({ row }) => {
+      const data= row.original
+      return (
+        <p className="font-bold">{data.product.name}</p>
       )
     },
   },
@@ -46,7 +64,8 @@ export const columns: ColumnDef<SellDAO>[] = [
       return (
         <div>
           <p className="font-bold">{data.comClient.name}</p>
-          <p>{data.comClient.code}-{data.currency}</p>
+          <p>{data.comClient.code}</p>
+          <p>{data.currency}</p>
         </div>
       )
     },
@@ -80,20 +99,6 @@ export const columns: ColumnDef<SellDAO>[] = [
     },
   },
 
-  {
-    accessorKey: "currency",
-    header: ({ column }) => {
-        return (
-          <Button variant="ghost" className="pl-0 dark:text-white"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Moneda
-            <ArrowUpDown className="w-4 h-4 ml-1" />
-          </Button>
-    )},
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
   {
     id: "actions",
     cell: ({ row }) => {
