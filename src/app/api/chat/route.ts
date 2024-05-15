@@ -5,9 +5,9 @@ import { getSystemMessage, messageArrived } from "@/services/conversationService
 import { getFunctionsDefinitions } from "@/services/function-services";
 import { getFullModelDAO, getFullModelDAOByName } from "@/services/model-services";
 import { getContext, setSectionsToMessage } from "@/services/section-services";
-import { GoogleGenerativeAIStream, OpenAIStream, StreamingTextResponse } from "ai";
+import { OpenAIStream, StreamingTextResponse } from "ai";
 import { OpenAI } from "openai";
-//import openaiTokenCounter from 'openai-gpt-token-counter';
+import openaiTokenCounter from 'openai-gpt-token-counter';
 import { NextResponse } from "next/server";
 import { processFunctionCall } from "@/services/functions";
 
@@ -100,8 +100,8 @@ export async function POST(req: Request) {
       const newMessages = createFunctionCallMessages(result);
 
       let baseArgs = {
-        // model: "gpt-4-1106-preview",
-        model: "gpt-4-turbo",
+        model: model.name,
+        temperature: 0,
         stream: true,
       };
     
@@ -124,16 +124,16 @@ export async function POST(req: Request) {
     onCompletion: async (completion) => {
       console.log("completion: ", completion)
 
-      // const partialPromptToken = openaiTokenCounter.chat(messages, "gpt-4") + 1
-      // console.log(`\tPartial prompt token count: ${partialPromptToken}`)      
-      // promptTokens += partialPromptToken
+      const partialPromptToken = openaiTokenCounter.chat(messages, "gpt-4") + 1
+      console.log(`\tPartial prompt token count: ${partialPromptToken}`)      
+      promptTokens += partialPromptToken
 
       const completionMessages = [
         { role: "assistant", content: completion },
       ]
-      // const partialCompletionTokens = openaiTokenCounter.chat(completionMessages, "gpt-4")
-      // console.log(`\tPartial completion token count: ${partialCompletionTokens}`)
-      // completionTokens += partialCompletionTokens
+      const partialCompletionTokens = openaiTokenCounter.chat(completionMessages, "gpt-4")
+      console.log(`\tPartial completion token count: ${partialCompletionTokens}`)
+      completionTokens += partialCompletionTokens
 
       if (!completion.includes("function_call")) {
         console.log(`Prompt token count: ${promptTokens}`)
