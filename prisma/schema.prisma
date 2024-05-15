@@ -316,6 +316,8 @@ model Sell {
 
   vendor        Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId      String
+
+  @@unique([comClientId, currency, productId, vendorId])
 }
 
 model Product {

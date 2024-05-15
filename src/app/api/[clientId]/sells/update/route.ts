@@ -23,15 +23,6 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         const externalId= json.externalId
         if (!externalId) return NextResponse.json({ error: "externalId is required" }, { status: 400 })
 
-//             Request Body:
-// {
-// "clientCode": "código del cliente",
-// "currency": "moneda de la transacción",
-// "clientName": "nombre del cliente",
-// "vendorName": "nombre del vendedor",
-// "externalId": "ranking del producto",
-// "quantity": cantidad vendida,
-// }
         const currency= json.currency
         const comClientName= json.clientName
         const vendorName= json.vendorName
@@ -58,7 +49,7 @@ export async function POST(request: Request, { params }: { params: { clientId: s
 
         revalidatePath("/client/[slug]/sells", 'page') 
         
-        return NextResponse.json( { "data": "to do" }, { status: 200 })
+        return NextResponse.json( { "data": updated }, { status: 200 })
 
     } catch (error) {
         return NextResponse.json({ error: "error: " + error}, { status: 502 })        

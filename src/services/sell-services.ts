@@ -80,9 +80,24 @@ export async function createOrUpdateSell(data: SellFormValues) {
 
   const vendor = await createOrUpdateVendor({name: data.vendorName, comClientId})
 
-  const sell= await prisma.sell.create({
-    data: {
+  const sell= await prisma.sell.upsert({
+    where: {
+      comClientId_currency_productId_vendorId: {
+        comClientId,
+        currency: data.currency,
+        productId: product.id,
+        vendorId: vendor.id,
+      },
+    },
+    create: {
       externalId: product.externalId,
+      quantity: data.quantity,
+      currency: data.currency,
+      comClientId,
+      productId: product.id,
+      vendorId: vendor.id,
+    },
+    update: {
       quantity: data.quantity,
       currency: data.currency,
       comClientId,
@@ -91,7 +106,7 @@ export async function createOrUpdateSell(data: SellFormValues) {
     }
   })
 
-  console.log(sell)
+  console.log("sell upsert")
 
   return sell as SellDAO
 }
