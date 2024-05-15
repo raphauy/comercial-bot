@@ -6,6 +6,8 @@ export type CategoryDAO = {
 	id: string
 	name: string
   clientId: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const categorySchema = z.object({
