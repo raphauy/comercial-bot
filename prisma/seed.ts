@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { seedProdcuts } from "./seed-products"
+// import { seedProdcuts } from "./seed-products"
 
 const prisma = new PrismaClient()
 
@@ -17,7 +17,7 @@ async function main() {
   // const gpt4TurboId= "clvfs48bd000285wuh6j2bxar"
   // await setModelToAllClients(gpt4TurboId, prisma)
 
-  await seedProdcuts(prisma, "./prisma/products.csv")
+  // await seedProdcuts(prisma, "./prisma/products.csv")
 
   console.log("Seeding complete")
 }

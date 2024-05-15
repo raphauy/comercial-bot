@@ -1,7 +1,7 @@
 "use server"
   
 import { revalidatePath } from "next/cache"
-import { VendorDAO, VendorFormValues, createVendor, updateVendor, getFullVendorDAO, deleteVendor } from "@/services/vendor-services"
+import { VendorDAO, VendorFormValues, getFullVendorDAO, deleteVendor, createOrUpdateVendor } from "@/services/vendor-services"
 
 
 export async function getVendorDAOAction(id: string): Promise<VendorDAO | null> {
@@ -9,16 +9,11 @@ export async function getVendorDAOAction(id: string): Promise<VendorDAO | null> 
 }
 
 export async function createOrUpdateVendorAction(id: string | null, data: VendorFormValues): Promise<VendorDAO | null> {       
-    let updated= null
-    if (id) {
-        updated= await updateVendor(id, data)
-    } else {
-        updated= await createVendor(data)
-    }     
+    const updated= createOrUpdateVendor(data)
 
     revalidatePath("/admin/vendors")
 
-    return updated as VendorDAO
+    return updated
 }
 
 export async function deleteVendorAction(id: string): Promise<VendorDAO | null> {    

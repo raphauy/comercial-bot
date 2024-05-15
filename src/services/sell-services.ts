@@ -93,7 +93,7 @@ export async function createOrUpdateSell(data: SellFormValues) {
 
   console.log(sell)
 
-  return sell
+  return sell as SellDAO
 }
 
 export async function deleteSell(id: string) {

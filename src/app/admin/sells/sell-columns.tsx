@@ -104,7 +104,7 @@ export const columns: ColumnDef<SellDAO>[] = [
       return (
         <div className="flex items-center justify-end gap-2">
 
-          <SellDialog id={data.id} />
+          {/* <SellDialog id={data.id} /> */}
           <DeleteSellDialog description={deleteDescription} id={data.id} />
         </div>
 

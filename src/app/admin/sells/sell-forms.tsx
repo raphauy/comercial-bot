@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Loader } from "lucide-react"
 
 type Props= {
-  id?: string
+  id: string
   closeDialog: () => void
 }
 
@@ -27,7 +27,7 @@ export function SellForm({ id, closeDialog }: Props) {
   const onSubmit = async (data: SellFormValues) => {
     setLoading(true)
     try {
-      await createOrUpdateSellAction(id ? id : null, data)
+      await createOrUpdateSellAction(data)
       toast({ title: id ? "Sell updated" : "Sell created" })
       closeDialog()
     } catch (error: any) {
@@ -59,21 +59,6 @@ export function SellForm({ id, closeDialog }: Props) {
           
           <FormField
             control={form.control}
-            name="externalId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ExternalId</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sell's externalId" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-      
-          <FormField
-            control={form.control}
             name="quantity"
             render={({ field }) => (
               <FormItem>
@@ -102,55 +87,12 @@ export function SellForm({ id, closeDialog }: Props) {
           />
           
       
-          <FormField
-            control={form.control}
-            name="comClientId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ComClientId</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sell's comClientId" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-      
-          <FormField
-            control={form.control}
-            name="productId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ProductId</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sell's productId" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-      
-          <FormField
-            control={form.control}
-            name="vendorId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>VendorId</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sell's vendorId" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           
 
         <div className="flex justify-end">
             <Button onClick={() => closeDialog()} type="button" variant={"secondary"} className="w-32">Cancel</Button>
             <Button type="submit" className="w-32 ml-2">
-              {loading ? <Loader className="h-4 w-4 animate-spin" /> : <p>Save</p>}
+              {loading ? <Loader className="w-4 h-4 animate-spin" /> : <p>Save</p>}
             </Button>
           </div>
         </form>
@@ -181,8 +123,8 @@ export function DeleteSellForm({ id, closeDialog }: Props) {
   return (
     <div>
       <Button onClick={() => closeDialog && closeDialog()} type="button" variant={"secondary"} className="w-32">Cancel</Button>
-      <Button onClick={handleDelete} variant="destructive" className="w-32 ml-2 gap-1">
-        { loading && <Loader className="h-4 w-4 animate-spin" /> }
+      <Button onClick={handleDelete} variant="destructive" className="w-32 gap-1 ml-2">
+        { loading && <Loader className="w-4 h-4 animate-spin" /> }
         Delete  
       </Button>
     </div>

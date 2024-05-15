@@ -8,7 +8,7 @@ export async function getSellDAOAction(id: string): Promise<SellDAO | null> {
     return getFullSellDAO(id)
 }
 
-export async function createOrUpdateSellAction(data: SellFormValues): Promise<boolean> {       
+export async function createOrUpdateSellAction(data: SellFormValues): Promise<SellDAO | null> {
     const updated= await createOrUpdateSell(data)
 
     revalidatePath("/admin/sells")

@@ -50,7 +50,7 @@ export async function createOrUpdateVendor(data: VendorFormValues) {
     })
   }
 
-  return vendor
+  return vendor as VendorDAO
 }
 
 

@@ -9,7 +9,7 @@ import { SellForm, DeleteSellForm } from "./sell-forms"
 import { getSellDAOAction } from "./sell-actions"
 
 type Props= {
-  id?: string
+  id: string
 }
 
 const addTrigger= <Button><PlusCircle size={22} className="mr-2"/>Create Sell</Button>
