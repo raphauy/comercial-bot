@@ -182,31 +182,31 @@ export type SimilaritySearchResult = {
 }
 
 
-  export async function similaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilaritySearchResult[]> {
-    console.log(`Searching for similar sections for: ${text} and clientId: ${clientId}`)
+export async function similaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilaritySearchResult[]> {
+  console.log(`Searching for similar sections for: ${text} and clientId: ${clientId}`)
 
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,
-      verbose: true,
-      modelName: "text-embedding-3-large",
-    });
-  
-    const vector = await embeddings.embedQuery(text);
-    const textEmbedding = pgvector.toSql(vector);
-  
-    let result: SimilaritySearchResult[] = [];
-  
-    result = await prisma.$queryRaw`
-      SELECT s."id", d."id" as "docId", d."name", s."text", s."secuence", s."embedding" <-> ${textEmbedding}::vector AS distance
-      FROM "Section" AS s
-      INNER JOIN "Document" AS d ON s."documentId" = d."id"
-      WHERE d."clientId" = ${clientId} AND s."embedding" <-> ${textEmbedding}::vector < 1.05
-      ORDER BY distance
-      LIMIT ${limit}`;
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,
+    verbose: true,
+    modelName: "text-embedding-3-large",
+  });
+
+  const vector = await embeddings.embedQuery(text);
+  const textEmbedding = pgvector.toSql(vector);
+
+  let result: SimilaritySearchResult[] = [];
+
+  result = await prisma.$queryRaw`
+    SELECT s."id", d."id" as "docId", d."name", s."text", s."secuence", s."embedding" <-> ${textEmbedding}::vector AS distance
+    FROM "Section" AS s
+    INNER JOIN "Document" AS d ON s."documentId" = d."id"
+    WHERE d."clientId" = ${clientId} AND s."embedding" <-> ${textEmbedding}::vector < 1.05
+    ORDER BY distance
+    LIMIT ${limit}`;
 
 
-    return result;
-  }
+  return result;
+}
   
 export async function getContext(clientId: string, phone: string, userInput: string) {
 

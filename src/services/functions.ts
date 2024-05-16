@@ -8,7 +8,7 @@ import { SummitFormValues, createSummit } from "./summit-services";
 import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCode, getFullProductDAOByRanking } from "./product-services";
+import { getFullProductDAOByCode, getFullProductDAOByRanking, similaritySearch } from "./product-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -131,6 +131,22 @@ export async function completarFrase(clientId: string, conversationId: string, t
 
 }
 
+export async function getProductsByName(clientId: string, name: string) {
+  console.log("getProductsByName")
+  console.log(`\tname: ${name}`)
+  
+  const result= await similaritySearch(clientId, name)
+  if (!result || result.length === 0) return "No se encontraron productos"
+
+  console.log(`\tgetProductsByName: ${result.length} productos encontrados`)
+  // log name and distance of each product
+  result.forEach((product) => {
+    console.log(`\t\t${product.nombre} - ${product.distance}`)
+  })
+  
+
+  return result
+}
 export async function getProductByCode(clientId: string, code: string) {
   console.log("getProductByCode")
   console.log(`\tcode: ${code}`)
@@ -215,6 +231,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getProductByRanking":
       content= await getProductByRanking(clientId, args.ranking)
+      break
+
+    case "getProductsByName":
+      content= await getProductsByName(clientId, args.name)
       break
   
     default:

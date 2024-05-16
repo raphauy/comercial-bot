@@ -2,6 +2,9 @@ import * as z from "zod"
 import { prisma } from "@/lib/db"
 import { CategoryDAO, CategoryFormValues, createCategory, getCategoryDAO, getCategoryDAOByName } from "./category-services"
 import { getClient, getClientBySlug } from "./clientService"
+import { OpenAIEmbeddings } from "langchain/embeddings/openai"
+import pgvector from 'pgvector/utils';
+import { TrimantProductResult } from "./functions"
 
 export type ProductDAO = {
 	id: string
@@ -87,6 +90,17 @@ export async function createOrUpdateProduct(data: ProductFormValues) {
     create: dataWithCategory,
     update: dataWithCategory,
   })
+
+  if (!created.id) return null
+
+  const toEmbed= {
+    nombre: data.name,
+    familia: category.name
+  }
+  const textToEmbed= JSON.stringify(toEmbed)
+  console.log(`Text: ${textToEmbed}`)  
+  await embedAndSave(textToEmbed, created.id)
+  
   return created  
 }
 
@@ -221,3 +235,69 @@ export async function getFullProductDAOByRanking(clientId: string, externalId: s
   }
   return res
 }
+
+async function embedAndSave(text: string, productId: string) {
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,
+    verbose: true,
+    modelName: "text-embedding-3-large",    
+  })
+  
+  const vector= await embeddings.embedQuery(text)
+  const embedding = pgvector.toSql(vector)
+  await prisma.$executeRaw`UPDATE "Product" SET embedding = ${embedding}::vector WHERE id = ${productId}`
+  console.log(`Text embeded: ${text}`)      
+}
+
+export type SimilarityProductResult = {
+	numeroRanking: string
+	codigo: string
+	nombre: string
+	stock: number
+	pedidoEnOrigen: number
+	precioUSD: number
+  familia: string
+  distance: number
+}
+
+export async function similaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilarityProductResult[]> {
+  console.log(`Searching for similar sections for: ${text} and clientId: ${clientId}`)
+
+  const embeddings = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,
+    verbose: true,
+    modelName: "text-embedding-3-large",
+  });
+
+  const vector = await embeddings.embedQuery(text);
+  const textEmbedding = pgvector.toSql(vector);
+
+
+  const similarityResult: any[] = await prisma.$queryRaw`
+    SELECT p."externalId", p."code", p."name", p."stock", p."pedidoEnOrigen", p."precioUSD", c."name" AS "categoryName", p."embedding" <-> ${textEmbedding}::vector AS distance
+    FROM "Product" AS p
+    INNER JOIN "Category" AS c ON p."categoryId" = c."id" 
+    WHERE p."clientId" = ${clientId} AND p."embedding" <-> ${textEmbedding}::vector < 1.05
+    ORDER BY distance
+    LIMIT ${limit}`;
+
+  const result: SimilarityProductResult[] = [];
+  for (const row of similarityResult) {
+    const product = await getFullProductDAOByExternalId(row.externalId, clientId)
+    if (product) {
+      result.push({
+        numeroRanking: row.externalId,
+        codigo: row.code,
+        nombre: row.name,
+        stock: row.stock,
+        pedidoEnOrigen: row.pedidoEnOrigen,
+        precioUSD: row.precioUSD,
+        familia: row.categoryName,
+        distance: row.distance
+      })
+    }
+  }
+
+  return result;
+}
+

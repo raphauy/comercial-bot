@@ -29,3 +29,19 @@ const getProductByRanking=
         "required": ["ranking"]
     }
 }
+
+const getProductsByName= 
+{
+    "name": "getProductsByName",
+    "description": "Esta es una búsqueda semántica o vectorial. Devuelve un array de productos que tengan similaridad semántica con el nombre de la consulta",
+        "parameters": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Nombre o parte del nombre del producto"
+            }
+        },
+        "required": ["name"]
+    }
+}
