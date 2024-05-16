@@ -37,7 +37,10 @@ export function removeSectionTexts(inputText: string): string {
 }
   
 
-export function getFormat(date: Date): string {
+export function getFormat(origDate: Date): string {
+  // Montevideo time date:
+  const timezone= "America/Montevideo"
+  const date= new Date(origDate.getTime())
   // if date is today return only the time
   const today= new Date()
   if (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
