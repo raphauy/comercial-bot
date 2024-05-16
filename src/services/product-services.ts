@@ -182,10 +182,31 @@ export async function getFullProductDAOByExternalId(externalId: string, clientId
   return res
 }
 
-export async function getFullProductDAOByCode(code: string) {
+export async function getFullProductDAOByCode(clientId: string, code: string) {
   const found = await prisma.product.findFirst({
     where: {
+      clientId,
       code
+    },
+    include: {
+			category: true,
+		}
+  })
+  if (!found) {
+    return null
+  }
+  const res: ProductDAO = {
+    ...found,
+    categoryName: found.category.name,
+  }
+  return res
+}
+
+export async function getFullProductDAOByRanking(clientId: string, externalId: string) {
+  const found = await prisma.product.findFirst({
+    where: {
+      clientId,
+      externalId
     },
     include: {
 			category: true,

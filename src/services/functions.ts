@@ -8,7 +8,7 @@ import { SummitFormValues, createSummit } from "./summit-services";
 import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCode } from "./product-services";
+import { getFullProductDAOByCode, getFullProductDAOByRanking } from "./product-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -131,25 +131,11 @@ export async function completarFrase(clientId: string, conversationId: string, t
 
 }
 
-// {
-//   "name": "getProductByCode",
-//   "description": "Devuelve un producto a partir de su código",
-//       "parameters": {
-//       "type": "object",
-//       "properties": {
-//           "code": {
-//               "type": "string",
-//               "description": "Código del producto"
-//           }
-//       },
-//       "required": ["code"]
-//   }
-// }
-export async function getProductByCode(code: string) {
+export async function getProductByCode(clientId: string, code: string) {
   console.log("getProductByCode")
   console.log(`\tcode: ${code}`)
   
-  const product= await getFullProductDAOByCode(code)
+  const product= await getFullProductDAOByCode(clientId, code)
   if (!product) return "Producto no encontrado"
 
   console.log(`\tgetProductByCode: product: ${product.name}`)
@@ -166,6 +152,29 @@ export async function getProductByCode(code: string) {
 
   return res
 }
+
+export async function getProductByRanking(clientId: string, ranking: string) {
+  console.log("getProductByRanking")
+  console.log(`\tranking: ${ranking}`)
+  
+  const product= await getFullProductDAOByRanking(clientId, ranking)
+  if (!product) return "Producto no encontrado"
+
+  console.log(`\tgetProductByRanking: product: ${product.name}`)
+
+  const res: TrimantProductResult = {
+    numeroRanking: product.externalId,
+    codigo: product.code,
+    nombre: product.name,
+    stock: product.stock,
+    pedidoEnOrigen: product.pedidoEnOrigen,
+    precioUSD: product.precioUSD,
+    familia: product.categoryName
+  }
+
+  return res
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -201,7 +210,11 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getProductByCode":
-      content= await getProductByCode(args.code)
+      content= await getProductByCode(clientId, args.code)
+      break
+
+    case "getProductByRanking":
+      content= await getProductByRanking(clientId, args.ranking)
       break
   
     default:
