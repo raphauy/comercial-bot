@@ -11,6 +11,8 @@ import openaiTokenCounter from 'openai-gpt-token-counter';
 import { NextResponse } from "next/server";
 import { processFunctionCall } from "@/services/functions";
 
+export const maxDuration = 30; // This function can run for a maximum of 30 seconds
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
 
