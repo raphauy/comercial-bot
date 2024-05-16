@@ -45,3 +45,19 @@ const getProductsByName=
         "required": ["name"]
     }
 }
+
+const getProductsByCategoryName= 
+{
+    "name": "getProductsByCategoryName",
+    "description": "Devuelve un array con los primeros productos de la categoría especificada ordenados por ranking.",
+        "parameters": {
+        "type": "object",
+        "properties": {
+            "categoryName": {
+                "type": "string",
+                "description": "Nombre de la categoría"
+            }
+        },
+        "required": ["categoryName"]
+    }
+}

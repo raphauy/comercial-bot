@@ -8,7 +8,7 @@ import { SummitFormValues, createSummit } from "./summit-services";
 import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCode, getFullProductDAOByRanking, similaritySearch } from "./product-services";
+import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, similaritySearch } from "./product-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -191,6 +191,21 @@ export async function getProductByRanking(clientId: string, ranking: string) {
   return res
 }
 
+export async function getProductsByCategoryName(clientId: string, categoryName: string) {
+  console.log("getProductsByCategoryName")
+  console.log(`\tcategoryName: ${categoryName}`)
+  
+  const result= await getFullProductDAOByCategoryName(clientId, categoryName)
+  if (!result || result.length === 0) return "No se encontraron productos"
+
+  console.log(`\tgetProductsByCategoryName: ${result.length} productos encontrados`)
+  result.forEach((product) => {
+    console.log(`\t\t${product.name}`)
+  })  
+
+  return result
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -231,6 +246,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getProductByRanking":
       content= await getProductByRanking(clientId, args.ranking)
+      break
+
+    case "getProductsByCategoryName":
+      content= await getProductsByCategoryName(clientId, args.categoryName)
       break
 
     case "getProductsByName":

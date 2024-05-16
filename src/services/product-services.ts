@@ -236,6 +236,34 @@ export async function getFullProductDAOByRanking(clientId: string, externalId: s
   return res
 }
 
+export async function getFullProductDAOByCategoryName(clientId: string, categoryName: string, limit: number = 5): Promise<ProductDAO[] | null> {
+  const found = await prisma.product.findMany({
+    where: {
+      clientId,
+      category: {
+        name: {
+          equals: categoryName,
+          mode: "insensitive"
+        }
+      }
+    },
+    include: {
+			category: true,
+		},
+    take: limit
+  })
+  if (!found) {
+    return null
+  }
+  const res: ProductDAO[] = found.map((product) => {
+    return {
+      ...product,
+      categoryName: product.category.name,
+    }
+  })
+  return res
+}
+
 async function embedAndSave(text: string, productId: string) {
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,
