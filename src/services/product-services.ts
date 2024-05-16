@@ -140,7 +140,7 @@ export async function getFullProductsDAO(slug: string) {
       clientId: client.id
     },
     orderBy: {
-      externalId: 'asc'
+      name: 'asc'
     },
     include: {
 			category: true,
