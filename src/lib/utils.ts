@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import { format } from "date-fns"
 import { twMerge } from "tailwind-merge"
 import he from 'he';
+import { es } from "date-fns/locale";
  
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,16 +38,13 @@ export function removeSectionTexts(inputText: string): string {
 }
   
 
-export function getFormat(origDate: Date): string {
-  // Montevideo time date:
-  const timezone= "America/Montevideo"
-  const date= new Date(origDate.getTime())
+export function getFormat(date: Date): string {
   // if date is today return only the time
   const today= new Date()
   if (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
-      return format(date, "HH:mm")
+      return format(date, "HH:mm", { locale: es })
   } else {
-      return format(date, "yyyy/MM/dd")
+      return format(date, "yyyy/MM/dd", { locale: es })
   }
 }
 
