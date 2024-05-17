@@ -8,7 +8,8 @@ import { SummitFormValues, createSummit } from "./summit-services";
 import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, similaritySearch } from "./product-services";
+import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
+import { clientSimilaritySearch, getComClientDAOByCode } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -135,13 +136,13 @@ export async function getProductsByName(clientId: string, name: string) {
   console.log("getProductsByName")
   console.log(`\tname: ${name}`)
   
-  const result= await similaritySearch(clientId, name)
+  const result= await productSimilaritySearch(clientId, name)
   if (!result || result.length === 0) return "No se encontraron productos"
 
   console.log(`\tgetProductsByName: ${result.length} productos encontrados`)
   // log name and distance of each product
   result.forEach((product) => {
-    console.log(`\t\t${product.nombre} - ${product.distance}`)
+    console.log(`\t\t${product.nombre} - ${product.vectorDistance}`)
   })
   
 
@@ -206,6 +207,52 @@ export async function getProductsByCategoryName(clientId: string, categoryName: 
   return result
 }
 
+type ClientResult = {
+	code: string
+	name: string
+	departamento: string | undefined
+	localidad: string | undefined
+	direccion: string | undefined
+	telefono: string | undefined
+}
+
+export async function getClientByCode(clientId: string, code: string) {
+  console.log("getClientByCode")
+  console.log(`\tcode: ${code}`)
+  
+  const client= await getComClientDAOByCode(clientId, code)
+  if (!client) return "Cliente no encontrado"
+
+  console.log(`\tgetClientByCode: client: ${client.name}`)
+
+  const res: ClientResult = {
+    code: client.code,
+    name: client.name,
+    departamento: client.departamento ?? "",
+    localidad: client.localidad ?? "",
+    direccion: client.direccion ?? "",
+    telefono: client.telefono ?? ""
+  }
+
+  return res
+}
+
+export async function getClientsByName(clientId: string, name: string) {
+  console.log("getClientsByName")
+  console.log(`\tname: ${name}`)
+  
+  const result= await clientSimilaritySearch(clientId, name)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetClientsByName: ${result.length} clientes encontrados`)
+  // log name and distance of each client
+  result.forEach((client) => {
+    console.log(`\t\t${client.name} - ${client.vectorDistance}`)
+  })
+
+  return result
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -254,6 +301,14 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getProductsByName":
       content= await getProductsByName(clientId, args.name)
+      break
+
+    case "getClientByCode":
+      content= await getClientByCode(clientId, args.code)
+      break
+
+    case "getClientsByName":
+      content= await getClientsByName(clientId, args.name)
       break
   
     default:

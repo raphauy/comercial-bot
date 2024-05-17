@@ -302,6 +302,9 @@ model ComClient {
   createdAt           DateTime     @default(now())         // gennext: skip.zod
   updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
 
+  embedding Unsupported("vector(3072)")?                      // gennext: skip.zod
+	@@map("ComClient")                                          // gennext: skip.list
+
   @@unique([clientId, code])
 }
 

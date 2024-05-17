@@ -61,3 +61,35 @@ const getProductsByCategoryName=
         "required": ["categoryName"]
     }
 }
+
+const getClientByCode= 
+{
+    "name": "getClientByCode",
+    "description": "Devuelve el cliente a partir de su código",
+        "parameters": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "string",
+                "description": "Código del cliente"
+            }
+        },
+        "required": ["code"]
+    }
+}
+
+const getClientsByName= 
+{
+    "name": "getClientsByName",
+    "description": "Esta es una búsqueda semántica o vectorial. Devuelve un array de clientes que tengan similaridad semántica con el nombre de la consulta",
+        "parameters": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Nombre o parte del nombre del cliente"
+            }
+        },
+        "required": ["name"]
+    }
+}

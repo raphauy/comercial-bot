@@ -4,7 +4,6 @@ import { CategoryDAO, CategoryFormValues, createCategory, getCategoryDAO, getCat
 import { getClient, getClientBySlug } from "./clientService"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
-import { TrimantProductResult } from "./functions"
 
 export type ProductDAO = {
 	id: string
@@ -285,10 +284,10 @@ export type SimilarityProductResult = {
 	pedidoEnOrigen: number
 	precioUSD: number
   familia: string
-  distance: number
+  vectorDistance: number
 }
 
-export async function similaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilarityProductResult[]> {
+export async function productSimilaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilarityProductResult[]> {
   console.log(`Searching for similar sections for: ${text} and clientId: ${clientId}`)
 
   const embeddings = new OpenAIEmbeddings({
@@ -321,7 +320,7 @@ export async function similaritySearch(clientId: string, text: string, limit: nu
         pedidoEnOrigen: row.pedidoEnOrigen,
         precioUSD: row.precioUSD,
         familia: row.categoryName,
-        distance: row.distance
+        vectorDistance: row.distance
       })
     }
   }
