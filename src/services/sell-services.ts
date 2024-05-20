@@ -80,7 +80,7 @@ export async function createOrUpdateSell(data: SellFormValues) {
     throw new Error("product not found")
   }
 
-  const vendor = await createOrUpdateVendor({name: data.vendorName, comClientId})
+  const vendor = await createOrUpdateVendor({name: data.vendorName, comClientId}, data.clientId)
 
   const sell= await prisma.sell.upsert({
     where: {

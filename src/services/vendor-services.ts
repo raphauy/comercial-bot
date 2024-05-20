@@ -35,15 +35,25 @@ export async function getVendorDAO(id: string) {
   return found as VendorDAO
 }
     
-export async function createOrUpdateVendor(data: VendorFormValues) {
+export async function createOrUpdateVendor(data: VendorFormValues, clientId: string) {
+  console.log("Searching for vendor with name and comClientId", data.name, data.comClientId)
+  
   let vendor= await prisma.vendor.findFirst({
     where: {
-      comClientId: data.comClientId,
+      comClient: {
+        client: {
+          id: clientId
+        }
+      },
       name: data.name,
     },
   })
+  console.log("vendor", vendor)
+  
 
   if (!vendor) {
+    console.log("Creating vendor")
+    
     vendor = await prisma.vendor.create({
       data: {
         comClientId: data.comClientId,
