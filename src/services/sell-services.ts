@@ -159,11 +159,31 @@ export async function getFullSellsDAO(slug: string) {
     },
     include: {
 			comClient: true,
-			product: true,
+			product: {
+				include: {  
+          category: true,
+        }
+      },
 			vendor: true,
 		}
   })
-  return found
+  const res: SellDAO[] = found.map((sell) => {
+    return {
+      ...sell,
+      product: {
+        ...sell.product,
+        categoryName: sell.product.category.name,
+      },
+      comClient: {
+        ...sell.comClient,
+        departamento: sell.comClient.departamento || "",
+        localidad: sell.comClient.localidad || "",
+        direccion: sell.comClient.direccion || "",
+        telefono: sell.comClient.telefono || "",
+      },
+    }
+  })
+  return res
 }
   
 export async function getFullSellDAO(id: string) {
