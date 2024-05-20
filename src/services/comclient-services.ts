@@ -113,7 +113,19 @@ export async function getFullComClientsDAO(slug: string) {
   return found as ComClientDAO[]
 }
 
-export async function getFullComClientsDAOByVendor(clientId: string, vendorName: string): Promise<ComClientDAO[]> {
+type SellsCountResult = {
+	cantVentas: number
+	cliente: {
+    codigo: string
+    nombre: string
+    departamento: string | undefined
+    localidad: string | undefined
+    direccion: string | undefined
+    telefono: string | undefined
+  }
+}
+
+export async function getFullComClientsDAOByVendor(clientId: string, vendorName: string): Promise<SellsCountResult[]> {
   const similarityVendors= await vendorSimilaritySearch(clientId, vendorName, 1)
   const similarityVendor= similarityVendors[0]
   if (similarityVendor) {
@@ -131,22 +143,29 @@ export async function getFullComClientsDAOByVendor(clientId: string, vendorName:
           vendorId: vendor.id
         }
       },
-      client: {
-        id: clientId
-      }
-    },
-    orderBy: {
-      sells: {
-        _count: 'desc'
-      },
+      clientId: clientId
     },
     include: {
-			client: true,
-		},
-    take: 10,
-  })
-
-  return found as ComClientDAO[]
+      client: true,
+      sells: true,
+    },
+  });
+  
+  const clientsWithSellCounts = found.map(client => ({
+    cantVentas: client.sells.length,
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    }
+  }))
+  .sort((a, b) => b.cantVentas - a.cantVentas)
+  .slice(0, 10); 
+ 
+  return clientsWithSellCounts as SellsCountResult[]
 }
   
 export async function getFullComClientDAO(id: string) {

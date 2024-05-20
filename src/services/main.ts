@@ -17,7 +17,7 @@ async function main() {
     // }
 
     const clientId = "cltc1dkoj01m1c7mpv5h3y00y"
-    const result= await getFullComClientsDAOByVendor(clientId, "Wasgubgtib Vendedor Viajero")
+    const result= await getFullComClientsDAOByVendor(clientId, "Washington Vendedor Viajero")
     console.log(result)
 
     console.log("Done")
