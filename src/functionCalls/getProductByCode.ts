@@ -93,3 +93,19 @@ const getClientsByName=
         "required": ["name"]
     }
 }
+
+const getClientsOfVendor= 
+{
+    "name": "getClientsOfVendor",
+    "description": "Devuelve un array de clientes asociados a un vendedor",
+        "parameters": {
+        "type": "object",
+        "properties": {
+            "vendorName": {
+                "type": "string",
+                "description": "Nombre del vendedor"
+            }
+        },
+        "required": ["vendorName"]
+    }
+}

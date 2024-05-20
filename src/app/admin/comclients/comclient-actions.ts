@@ -1,7 +1,7 @@
 "use server"
   
 import { revalidatePath } from "next/cache"
-import { ComClientDAO, ComClientFormValues, createComClient, updateComClient, getFullComClientDAO, deleteComClient } from "@/services/comclient-services"
+import { ComClientDAO, ComClientFormValues, createComClient, updateComClient, getFullComClientDAO, deleteComClient, deleteAllComClientsByClient } from "@/services/comclient-services"
 
 
 export async function getComClientDAOAction(id: string): Promise<ComClientDAO | null> {
@@ -29,3 +29,10 @@ export async function deleteComClientAction(id: string): Promise<ComClientDAO | 
     return deleted as ComClientDAO
 }
 
+export async function deleteAllComClientsByClientAction(clientId: string): Promise<boolean> {
+    const ok= await deleteAllComClientsByClient(clientId)
+
+    revalidatePath("/admin/comclients")
+
+    return ok
+}

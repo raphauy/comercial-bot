@@ -9,7 +9,7 @@ import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getComClientDAOByCode } from "./comclient-services";
+import { clientSimilaritySearch, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -253,6 +253,19 @@ export async function getClientsByName(clientId: string, name: string) {
   return result
 }
 
+export async function getClientsOfVendor(clientId: string, vendorName: string) {
+  console.log("getClientsOfVendor")
+  console.log(`\tvendorName: ${vendorName}`)
+  
+  const result= await getFullComClientsDAOByVendor(clientId, vendorName)
+  if (!result || result.length === 0) return "No se encontraron clientes de este vendedor"
+
+  console.log(`\tgetClientsOfVendor: ${result.length} clientes encontrados`)
+  
+
+  return result
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -309,6 +322,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getClientsByName":
       content= await getClientsByName(clientId, args.name)
+      break
+
+    case "getClientsOfVendor":
+      content= await getClientsOfVendor(clientId, args.vendorName)
       break
   
     default:

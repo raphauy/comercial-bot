@@ -1,23 +1,26 @@
-import { prisma } from "@/lib/db"
-import { getFunctionsDefinitions } from "./function-services"
-import openaiTokenCounter from 'openai-gpt-token-counter'
+import { getFullComClientsDAOByVendor } from "./comclient-services"
+import { VendorFormValues, createOrUpdateVendor, getVendorsDAO } from "./vendor-services"
 
 async function main() {
 
-    const text = "Hola, buenos días!"
-    const model = "gpt-4"
+    // const vendors= await getVendorsDAO()
+    // console.log(vendors.length)
 
-    let tokenCount = openaiTokenCounter.text(text, model)
-    console.log(`Token count: ${tokenCount}`)
+    // // iterate over vendors and update their values
+    // for (const vendor of vendors) { 
+        
+    //     const vendorFormValue: VendorFormValues = {
+    //         name: vendor.name,
+    //         comClientId: vendor.comClientId,
+    //     }
+    //     const updatedVendor = await createOrUpdateVendor(vendorFormValue)
+    // }
 
-    const messages = [
-        { role: "system", content: "Usted es un asistente virtual muy entusiasta" },
-        { role: "user", content: "Hola, buenos días!" },
-        { role: "assistant", content: "¡Buenos días! ¿En qué puedo asistirte hoy con mi entusiasmo y energía? 😄" },
-    ]
+    const clientId = "cltc1dkoj01m1c7mpv5h3y00y"
+    const result= await getFullComClientsDAOByVendor(clientId, "Wasgubgtib Vendedor Viajero")
+    console.log(result)
 
-    tokenCount = openaiTokenCounter.chat(messages, model)
-    console.log(`Message token count: ${tokenCount}`)
+    console.log("Done")
 
 }
   

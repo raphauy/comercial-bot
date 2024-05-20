@@ -288,7 +288,7 @@ export type SimilarityProductResult = {
 }
 
 export async function productSimilaritySearch(clientId: string, text: string, limit: number = 5): Promise<SimilarityProductResult[]> {
-  console.log(`Searching for similar sections for: ${text} and clientId: ${clientId}`)
+  console.log(`Searching for similar products for: ${text} and clientId: ${clientId}`)
 
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,

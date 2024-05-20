@@ -1,8 +1,8 @@
-import * as z from "zod"
 import { prisma } from "@/lib/db"
+import * as z from "zod"
 import { ComClientDAO, ComClientFormValues, createComClient, getFullComClientDAOByCode } from "./comclient-services"
 import { ProductDAO, getFullProductDAOByExternalId } from "./product-services"
-import { VendorDAO, createOrUpdateVendor, getFullVendorDAOByNameAndComclientId } from "./vendor-services"
+import { VendorDAO, createOrUpdateVendor } from "./vendor-services"
 
 export type SellDAO = {
 	id: string
@@ -55,6 +55,8 @@ export async function getSellDAO(id: string) {
 }
     
 export async function createOrUpdateSell(data: SellFormValues) {
+  console.log("data: ", data)
+  
   // get comClient by code, if not found, create it
   let comClientId
   const comClient= await getFullComClientDAOByCode(data.comClientCode, data.clientId)
@@ -80,7 +82,7 @@ export async function createOrUpdateSell(data: SellFormValues) {
     throw new Error("product not found")
   }
 
-  const vendor = await createOrUpdateVendor({name: data.vendorName, comClientId})
+  const vendor = await createOrUpdateVendor({name: data.vendorName})
 
   const sell= await prisma.sell.upsert({
     where: {
@@ -107,6 +109,26 @@ export async function createOrUpdateSell(data: SellFormValues) {
       vendorId: vendor.id,
     }
   })
+
+  // connect vendor to comClient, but first check if vendor is already connected to comClient
+  const comClientVendor = await prisma.comClientVendor.findFirst({
+    where: {
+      comClient: {
+        id: comClientId,
+      },
+      vendor: {
+        id: vendor.id,
+      },
+    },
+  })
+  if (!comClientVendor) {
+    await prisma.comClientVendor.create({
+      data: {
+        comClientId,
+        vendorId: vendor.id,
+      }
+    })
+  }
 
   console.log("sell upsert")
 
@@ -141,7 +163,7 @@ export async function getFullSellsDAO(slug: string) {
 			vendor: true,
 		}
   })
-  return found as SellDAO[]
+  return found
 }
   
 export async function getFullSellDAO(id: string) {
@@ -155,6 +177,6 @@ export async function getFullSellDAO(id: string) {
 			vendor: true,
 		}
   })
-  return found as SellDAO
+  return found
 }
     

@@ -84,6 +84,7 @@ model Client {
   comClients            ComClient[]
   products              Product[]
   categories            Category[]
+  vendors               Vendor[]
 }
 
 model Document {
@@ -297,7 +298,7 @@ model ComClient {
   clientId        String
 
   sells           Sell[]                            // gennext: skip.list
-  vendors         Vendor[]                          // gennext: skip.list
+  vendors         ComClientVendor[]                 // Relación muchos a muchos
 
   createdAt           DateTime     @default(now())         // gennext: skip.zod
   updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
@@ -363,8 +364,13 @@ model Vendor {
   createdAt           DateTime     @default(now())         // gennext: skip.zod
   updatedAt           DateTime     @updatedAt @default(now())  // gennext: skip.zod show.column
 
-  comClient       ComClient @relation(fields: [comClientId], references: [id], onDelete: Cascade)
-  comClientId     String
+  comClients      ComClientVendor[]                 // Relación muchos a muchos
+
+  client          Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        String @default("cltc1dkoj01m1c7mpv5h3y00y")
+
+  embedding Unsupported("vector(3072)")?                      // gennext: skip.zod
+	@@map("Vendor")                                            // gennext: skip.list
 }
 
 model Category {
@@ -377,4 +383,14 @@ model Category {
 
   client          Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId        String
+}
+
+model ComClientVendor {
+  comClientId   String
+  vendorId      String
+
+  comClient     ComClient @relation(fields: [comClientId], references: [id])
+  vendor        Vendor    @relation(fields: [vendorId], references: [id])
+
+  @@id([comClientId, vendorId])
 }

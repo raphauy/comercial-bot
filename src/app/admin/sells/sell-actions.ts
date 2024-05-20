@@ -5,6 +5,7 @@ import { SellDAO, SellFormValues,  getFullSellDAO, deleteSell, createOrUpdateSel
 
 
 export async function getSellDAOAction(id: string): Promise<SellDAO | null> {
+    // @ts-ignore
     return getFullSellDAO(id)
 }
 

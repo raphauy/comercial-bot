@@ -2,6 +2,7 @@ import * as z from "zod"
 import { prisma } from "@/lib/db"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
+import { getFullVendorDAO, getFullVendorDAOByName, vendorSimilaritySearch } from "./vendor-services";
 
 export type ComClientDAO = {
 	id: string
@@ -106,6 +107,39 @@ export async function getFullComClientsDAO(slug: string) {
 			client: true,
 		}
   })
+  return found as ComClientDAO[]
+}
+
+export async function getFullComClientsDAOByVendor(clientId: string, vendorName: string): Promise<ComClientDAO[]> {
+  const similarityVendors= await vendorSimilaritySearch(clientId, vendorName, 1)
+  const similarityVendor= similarityVendors[0]
+  if (similarityVendor) {
+    vendorName= similarityVendor.nombre
+  }
+  console.log(`Vendor name: ${vendorName}`)
+  
+  const vendor= await getFullVendorDAOByName(clientId, vendorName)
+  console.log(`Vendor: ${JSON.stringify(vendor)}`)
+  
+  const found = await prisma.comClient.findMany({
+    where: {
+      vendors: {
+        some: {
+          vendorId: vendor.id
+        }
+      },
+      client: {
+        id: clientId
+      }
+    },
+    orderBy: {
+      id: 'asc'
+    },
+    include: {
+			client: true,
+		}
+  })
+
   return found as ComClientDAO[]
 }
   
@@ -224,3 +258,29 @@ export async function clientSimilaritySearch(clientId: string, text: string, lim
   return result;
 }
 
+
+export async function deleteAllComClientsByClient(clientId: string): Promise<boolean> {
+  console.log("deleteAllComClientsByClient", clientId)
+
+  // disconnect all vendors from client
+  await prisma.comClientVendor.deleteMany({
+    where: {
+      comClient: {
+        clientId
+      }
+    },
+  })
+  
+  try {
+    await prisma.comClient.deleteMany({
+      where: {
+        clientId
+      },
+    })
+    return true
+  
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+}

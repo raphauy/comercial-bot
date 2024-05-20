@@ -5,7 +5,7 @@ import { ArrowLeftRight, ChevronsLeft, ChevronsRight, Loader, Pencil, PlusCircle
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { toast } from "@/components/ui/use-toast";
-import { ComClientForm, DeleteComClientForm } from "./comclient-forms"
+import { ComClientForm, DeleteAllComClientsForm, DeleteComClientForm } from "./comclient-forms"
 import { getComClientDAOAction } from "./comclient-actions"
 
 type Props= {
@@ -58,12 +58,25 @@ export function DeleteComClientDialog({ id, description }: DeleteProps) {
   )
 }
 
-interface CollectionProps{
-  id: string
-  title: string
+type DeleteAllProps= {
+  clientId: string
 }
 
+export function DeleteAllComClientsDialog({ clientId }: DeleteAllProps) {
+  const [open, setOpen] = useState(false)
 
-
-
-  
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="destructive"><Trash2 className="w-5 h-5 mr-2"/>Borrar todos los clientes</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Borrar todos los clientes</DialogTitle>
+          <DialogDescription className="py-8">Estas seguro que quiere borrar todos los clientes?</DialogDescription>
+        </DialogHeader>
+        <DeleteAllComClientsForm closeDialog={() => setOpen(false)} clientId={clientId} />
+      </DialogContent>
+    </Dialog>
+  )
+}

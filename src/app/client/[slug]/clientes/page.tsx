@@ -1,5 +1,7 @@
 import { columns } from "@/app/admin/comclients/comclient-columns"
+import { DeleteAllComClientsDialog } from "@/app/admin/comclients/comclient-dialogs"
 import { DataTable } from "@/app/admin/comclients/comclient-table"
+import { getClientBySlug } from "@/services/clientService"
 import { getFullComClientsDAO } from "@/services/comclient-services"
 
 type Props = {
@@ -11,7 +13,9 @@ type Props = {
 export default async function ComClientPage({ params }: Props) {
   
   const slug = params.slug
-  
+  const client= await getClientBySlug(slug)
+  if (!client) return <div>Cliente no encontrado</div>
+
   const data= await getFullComClientsDAO(slug)
   const departamentos= data.map((client) => client.departamento ?? "")
   const departamentosUnique= Array.from(new Set(departamentos))
@@ -25,6 +29,10 @@ export default async function ComClientPage({ params }: Props) {
 
       <div className="container p-3 py-4 mx-auto bg-white border rounded-md text-muted-foreground dark:text-white">
         <DataTable columns={columns} data={data} subject="Clientes" columnsOff={["localidad"]} departmentos={departamentosUnique} localidades={localidadesUnique}/>
+      </div>
+
+      <div className="flex justify-end mx-auto my-2">
+        <DeleteAllComClientsDialog clientId={client.id} />
       </div>
     </div>
   )

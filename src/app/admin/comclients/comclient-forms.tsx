@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "@/components/ui/use-toast"
 import { useEffect, useState } from "react"
-import { deleteComClientAction, createOrUpdateComClientAction, getComClientDAOAction } from "./comclient-actions"
+import { deleteComClientAction, createOrUpdateComClientAction, getComClientDAOAction, deleteAllComClientsByClientAction } from "./comclient-actions"
 import { comClientSchema, ComClientFormValues } from '@/services/comclient-services'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -204,3 +204,36 @@ export function DeleteComClientForm({ id, closeDialog }: Props) {
   )
 }
 
+type DeleteAllProps= {
+  clientId: string
+  closeDialog: () => void
+}
+
+export function DeleteAllComClientsForm({ clientId, closeDialog }: DeleteAllProps) {
+  const [loading, setLoading] = useState(false)
+
+  async function handleDelete() {
+    setLoading(true)
+    deleteAllComClientsByClientAction(clientId)
+    .then(() => {
+      toast({title: "Clientes eliminados" })
+    })
+    .catch((error) => {
+      toast({title: "Error", description: error.message, variant: "destructive"})
+    })
+    .finally(() => {
+      setLoading(false)
+      closeDialog && closeDialog()
+    })
+  }
+  
+  return (
+    <div>
+      <Button onClick={() => closeDialog && closeDialog()} type="button" variant={"secondary"} className="w-32">Cancel</Button>
+      <Button onClick={handleDelete} variant="destructive" className="gap-1 ml-2">
+        { loading && <Loader className="w-4 h-4 animate-spin" /> }
+        Borrar todos los clientes
+      </Button>
+    </div>
+  )
+}
