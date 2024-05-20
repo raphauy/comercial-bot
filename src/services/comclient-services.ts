@@ -65,6 +65,7 @@ export async function createComClient(data: ComClientFormValues) {
 }
 
 export async function updateComClient(id: string, data: ComClientFormValues) {
+  const comClient = await getComClientDAO(id)
   const updated = await prisma.comClient.update({
     where: {
       id
@@ -72,13 +73,15 @@ export async function updateComClient(id: string, data: ComClientFormValues) {
     data
   })
 
-  const toEmbed= {
-    nombre: data.name,
-    codigo: data.code,
+  if (comClient.name !== data.name) {
+    const toEmbed= {
+      nombre: data.name,
+      codigo: data.code,
+    }
+    const textToEmbed= JSON.stringify(toEmbed)
+    console.log(`Text: ${textToEmbed}`)  
+    await embedAndSave(textToEmbed, updated.id)
   }
-  const textToEmbed= JSON.stringify(toEmbed)
-  console.log(`Text: ${textToEmbed}`)  
-  await embedAndSave(textToEmbed, updated.id)
 
   return updated
 }
@@ -133,11 +136,14 @@ export async function getFullComClientsDAOByVendor(clientId: string, vendorName:
       }
     },
     orderBy: {
-      id: 'asc'
+      sells: {
+        _count: 'desc'
+      },
     },
     include: {
 			client: true,
-		}
+		},
+    take: 10,
   })
 
   return found as ComClientDAO[]

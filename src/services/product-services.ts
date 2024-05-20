@@ -79,6 +79,9 @@ export async function createOrUpdateProduct(data: ProductFormValues) {
     clientId: client.id
   }
 
+  const product= await getFullProductDAOByExternalId(data.externalId, data.clientId)
+  const productName= product?.name
+
   const created = await prisma.product.upsert({
     where: {
       clientId_externalId: {
@@ -92,13 +95,15 @@ export async function createOrUpdateProduct(data: ProductFormValues) {
 
   if (!created.id) return null
 
-  const toEmbed= {
-    nombre: data.name,
-    familia: category.name
+  if (productName !== data.name) {
+    const toEmbed= {
+      nombre: data.name,
+      familia: category.name
+    }
+    const textToEmbed= JSON.stringify(toEmbed)
+    console.log(`Text: ${textToEmbed}`)  
+    await embedAndSave(textToEmbed, created.id)  
   }
-  const textToEmbed= JSON.stringify(toEmbed)
-  console.log(`Text: ${textToEmbed}`)  
-  await embedAndSave(textToEmbed, created.id)
   
   return created  
 }
