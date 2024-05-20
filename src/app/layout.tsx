@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import Header from '../components/header/header'
 import Menu from "@/components/header/menu"
 import SessionProvider from '@/components/SessionProvider'
-
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: "OsomGPT",
@@ -47,6 +47,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
                 <div className="flex flex-col items-center flex-1">
                   {children}
+                  <Analytics />
                   <Toaster />
                 </div>
               </div>            

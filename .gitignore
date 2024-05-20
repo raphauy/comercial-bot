@@ -45,6 +45,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.prod
 .env.postgres.docker
 
 # vercel
