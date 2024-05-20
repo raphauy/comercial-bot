@@ -366,3 +366,20 @@ export async function setFunctions(clientId: string, functionIs: string[]) {
 
   return true
 }
+
+export async function getClientByComClientId(comClientId: string) {
+  const client= await prisma.client.findFirst({
+    where: {
+      comClients: {
+        some: {
+          id: comClientId
+        }
+      }
+    },
+    include: {
+      functions: true
+    }
+  })
+
+  return client
+}

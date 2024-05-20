@@ -1,5 +1,6 @@
 import * as z from "zod"
 import { prisma } from "@/lib/db"
+import { getClientByComClientId } from "./clientService"
 
 export type VendorDAO = {
 	id: string
@@ -35,14 +36,17 @@ export async function getVendorDAO(id: string) {
   return found as VendorDAO
 }
     
-export async function createOrUpdateVendor(data: VendorFormValues, clientId: string) {
+export async function createOrUpdateVendor(data: VendorFormValues) {
+  const client= await getClientByComClientId(data.comClientId)
+  if (!client) throw new Error('No se encontró un cliente con el comClientId')
+  
   console.log("Searching for vendor with name and comClientId", data.name, data.comClientId)
   
   let vendor= await prisma.vendor.findFirst({
     where: {
       comClient: {
         client: {
-          id: clientId
+          id: client.id
         }
       },
       name: data.name,
