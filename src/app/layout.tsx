@@ -6,12 +6,12 @@ import { Toaster } from "@/components/ui/toaster"
 import { TailwindIndicator } from '@/components/shadcn/tailwind-indicator'
 import { ThemeProvider } from '@/components/shadcn/theme-provider'
 import getSession from '@/lib/auth'
-//import { fontSans } from '@/lib/fonts'
 import { cn } from "@/lib/utils"
 import Header from '../components/header/header'
 import Menu from "@/components/header/menu"
 import SessionProvider from '@/components/SessionProvider'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   title: "OsomGPT",
@@ -48,6 +48,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 <div className="flex flex-col items-center flex-1">
                   {children}
                   <Analytics />
+                  <SpeedInsights />
                   <Toaster />
                 </div>
               </div>            
