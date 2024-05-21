@@ -1,4 +1,4 @@
-import { getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl } from "./comclient-services"
+import { getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl } from "./comclient-services"
 
 async function main() {
 
@@ -16,8 +16,10 @@ async function main() {
     // }
 
     const clientId = "cltc1dkoj01m1c7mpv5h3y00y"
-    const categoryName = "20v"
-    const result = await getBuyersOfProductByCategoryImpl(clientId, categoryName)
+    //const categoryName = "20v"
+    //const result = await getBuyersOfProductByCategoryImpl(clientId, categoryName)
+    const ranking= "62"
+    const result = await getBuyersOfProductByRankingImpl(clientId, ranking)
     console.log(result)
 
     console.log("Done")

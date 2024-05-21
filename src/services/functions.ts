@@ -9,7 +9,7 @@ import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
+import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -278,6 +278,18 @@ export async function getBuyersOfProductByCode(clientId: string, code: string) {
   return result
 }
 
+export async function getBuyersOfProductByRanking(clientId: string, ranking: string) {
+  console.log("getBuyersOfProductByRanking")
+  console.log(`\tranking: ${ranking}`)
+  
+  const result= await getBuyersOfProductByRankingImpl(clientId, ranking)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetBuyersOfProductByRanking: ${result.length} clientes encontrados`)  
+
+  return result
+}
+
 export async function getBuyersOfProductByCategory(clientId: string, categoryName: string) {
   console.log("getBuyersOfProductByCategory")
   console.log(`\tcategoryName: ${categoryName}`)
@@ -354,6 +366,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getBuyersOfProductByCode":
       content= await getBuyersOfProductByCode(clientId, args.code)
+      break
+
+    case "getBuyersOfProductByRanking":
+      content= await getBuyersOfProductByRanking(clientId, args.ranking)
       break
     
     case "getBuyersOfProductByCategory":
