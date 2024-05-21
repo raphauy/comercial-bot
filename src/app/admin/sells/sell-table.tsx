@@ -10,6 +10,7 @@ import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRende
 import { DataTablePagination } from "@/components/data-table/data-table-pagination"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter"
+import { useSearchParams } from "next/navigation"
   
 interface DataTableToolbarProps<TData> {
   table: TanstackTable<TData>
@@ -42,8 +43,8 @@ export function DataTableToolbar<TData>({ table, vendors }: DataTableToolbarProp
       />
 
       <Input className="max-w-xs" placeholder="filtrar por producto"
-          value={(table.getColumn("productName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("productName")?.setFilterValue(event.target.value)}                
+          value={(table.getColumn("product")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("product")?.setFilterValue(event.target.value)}                
       />
             
       <Input className="max-w-xs" placeholder="filtrar por cliente"
@@ -110,10 +111,12 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
   React.useEffect(() => {
     columnsOff && columnsOff.forEach(colName => {
       table.getColumn(colName)?.toggleVisibility(false)      
     });
+
   // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, [])
 

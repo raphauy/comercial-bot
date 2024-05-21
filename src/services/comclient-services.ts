@@ -219,6 +219,156 @@ export async function getComClientDAOByCode(clientId: string, code: string) {
   
 }
 
+type BuyCountResult = {
+	cantCompras: number
+	cliente: {
+    codigo: string
+    nombre: string
+    departamento: string | undefined
+    localidad: string | undefined
+    direccion: string | undefined
+    telefono: string | undefined
+  }
+}
+
+export async function getBuyersOfProductByCodeImpl(clientId: string, productCode: string): Promise<BuyCountResult[]> {
+  const found = await prisma.comClient.findMany({
+    where: {
+      clientId,
+      sells: {
+        some: {
+          product: {
+            code: productCode
+          }
+        }
+      }
+    },
+    include: {
+			client: true,
+      sells: {
+        include: {
+          product: true,
+        },
+      }
+		},
+  })
+
+  const clientsWithSellCounts = found.map(client => ({
+    cantCompras: client.sells.filter(sell => sell.product.code === productCode)[0].quantity,
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    }
+  }))
+  .sort((a, b) => b.cantCompras - a.cantCompras)
+  .slice(0, 10); 
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
+
+export async function getBuyersOfProductByRankingImpl(clientId: string, productRanking: string): Promise<BuyCountResult[]> {
+  const found = await prisma.comClient.findMany({
+    where: {
+      clientId,
+      sells: {
+        some: {
+          product: {
+            externalId: productRanking
+          }
+        }
+      }
+    },
+    include: {
+			client: true,
+      sells: {
+        include: {
+          product: true,
+        },
+      }
+		},
+  })
+
+  const clientsWithSellCounts = found.map(client => ({
+    cantCompras: client.sells.filter(sell => sell.product.externalId === productRanking)[0].quantity,
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    }
+  }))
+  .sort((a, b) => b.cantCompras - a.cantCompras)
+  .slice(0, 10); 
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
+
+export async function getBuyersOfProductByCategoryImpl(clientId: string, categoryName: string): Promise<BuyCountResult[]> {
+  if (categoryName === "12v")
+    categoryName = "12V"
+  else if (categoryName === "220v")
+    categoryName = "220V"
+  else if (categoryName === "20V")
+    categoryName = "20v"
+  else if (categoryName === "consumibles")
+    categoryName = "Consumibles"
+  else if (categoryName === "explosion")
+    categoryName = "Explosion"
+  else if (categoryName === "explosión")
+    categoryName = "Explosion"
+  else if (categoryName === "manuales")
+    categoryName = "Manuales"
+
+  const found = await prisma.comClient.findMany({
+    where: {
+      clientId,
+      sells: {
+        some: {
+          product: {
+            category: {
+              name: categoryName
+            }
+          }
+        }
+      }
+    },
+    include: {
+			client: true,
+      sells: {
+        include: {
+          product: {
+            include: {
+              category: true,
+            }
+          }
+        },
+      }
+		},
+  })
+
+  const clientsWithSellCounts = found.map(client => ({
+    // aggregate all quantity of products of the same category
+    cantCompras: client.sells.filter(sell => sell.product.category.name === categoryName).reduce((acc, sell) => acc + sell.quantity, 0),
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    }
+  }))
+  .sort((a, b) => b.cantCompras - a.cantCompras)
+  .slice(0, 10); 
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
 
 async function embedAndSave(text: string, comClientId: string) {
   const embeddings = new OpenAIEmbeddings({

@@ -109,3 +109,51 @@ const getClientsOfVendor=
         "required": ["vendorName"]
     }
 }
+
+const getBuyersOfProductByCode=
+{
+    "name": "getBuyersOfProductByCode",
+    "description": "Devuelve los principales compradores de un producto a partir del código del producto",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "string",
+                "description": "Código del producto"
+            }
+        },
+        "required": ["code"]
+    }
+}
+
+const getBuyersOfProductByRanking=
+{
+    "name": "getBuyersOfProductByRanking",
+    "description": "Devuelve los principales compradores de un producto a partir del número de ranking del producto",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "ranking": {
+                "type": "string",
+                "description": "Número de Ranking del producto"
+            }
+        },
+        "required": ["ranking"]
+    }
+}
+
+const getBuyersOfProductByCategory=
+{
+    "name": "getBuyersOfProductByCategory",
+    "description": "Devuelve los principales compradores de un producto a partir de la categoría del producto. Estas son las principales categorías: 12v, 20v, 220v, Consumibles, Explosion, Manuales",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "categoryName": {
+                "type": "string",
+                "description": "Nombre de la categoría del producto"
+            }
+        },
+        "required": ["categoryName"]
+    }
+}

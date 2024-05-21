@@ -10,6 +10,9 @@ import { ComClientDAO } from "@/services/comclient-services"
 import { es } from "date-fns/locale"
 import { VendorDAO } from "@/services/vendor-services"
 import { ProductDAO } from "@/services/product-services"
+import Link from "next/link"
+import ProductBox from "./product-box"
+import ClientBox from "./client-box"
 
 
 export const columns: ColumnDef<SellDAO>[] = [
@@ -35,7 +38,7 @@ export const columns: ColumnDef<SellDAO>[] = [
   },
 
   {
-    accessorKey: "productName",
+    accessorKey: "product",
     header: ({ column }) => {
         return (
           <Button variant="ghost" className="pl-0 dark:text-white"
@@ -47,12 +50,13 @@ export const columns: ColumnDef<SellDAO>[] = [
     cell: ({ row }) => {
       const data= row.original
       return (
-        <p className="font-bold">{data.product.name}</p>
+        <ProductBox data={data.product} />
       )
     },
     filterFn: (row, id, value) => {
       const product: ProductDAO= row.original.product
-      return product.name.toLowerCase().includes(value.toLowerCase())
+      const filter= product.name.toLowerCase().includes(value.toLowerCase()) || product.code.toLowerCase().includes(value.toLowerCase())
+      return filter
     },
   },
 
@@ -69,10 +73,7 @@ export const columns: ColumnDef<SellDAO>[] = [
     cell: ({ row }) => {
       const data= row.original
       return (
-        <div className="min-w-[150px]">
-          <p className="font-bold">{data.comClient.name}</p>
-          <p>{data.comClient.code} - {data.currency}</p>
-        </div>
+        <ClientBox data={data} />
       )
     },
     filterFn: (row, id, value) => {

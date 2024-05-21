@@ -9,7 +9,7 @@ import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
+import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -266,6 +266,30 @@ export async function getClientsOfVendor(clientId: string, vendorName: string) {
   return result
 }
 
+export async function getBuyersOfProductByCode(clientId: string, code: string) {
+  console.log("getBuyersOfProductByCode")
+  console.log(`\tproductCode: ${code}`)
+  
+  const result= await getBuyersOfProductByCodeImpl(clientId, code)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetBuyersOfProductByCode: ${result.length} clientes encontrados`)  
+
+  return result
+}
+
+export async function getBuyersOfProductByCategory(clientId: string, categoryName: string) {
+  console.log("getBuyersOfProductByCategory")
+  console.log(`\tcategoryName: ${categoryName}`)
+  
+  const result= await getBuyersOfProductByCategoryImpl(clientId, categoryName)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetBuyersOfProductByCategory: ${result.length} clientes encontrados`)  
+
+  return result
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -326,6 +350,14 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getClientsOfVendor":
       content= await getClientsOfVendor(clientId, args.vendorName)
+      break
+
+    case "getBuyersOfProductByCode":
+      content= await getBuyersOfProductByCode(clientId, args.code)
+      break
+    
+    case "getBuyersOfProductByCategory":
+      content= await getBuyersOfProductByCategory(clientId, args.categoryName)
       break
   
     default:

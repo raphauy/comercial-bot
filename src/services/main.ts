@@ -1,5 +1,4 @@
-import { getFullComClientsDAOByVendor } from "./comclient-services"
-import { VendorFormValues, createOrUpdateVendor, getVendorsDAO } from "./vendor-services"
+import { getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl } from "./comclient-services"
 
 async function main() {
 
@@ -17,7 +16,8 @@ async function main() {
     // }
 
     const clientId = "cltc1dkoj01m1c7mpv5h3y00y"
-    const result= await getFullComClientsDAOByVendor(clientId, "Washington Vendedor Viajero")
+    const categoryName = "20v"
+    const result = await getBuyersOfProductByCategoryImpl(clientId, categoryName)
     console.log(result)
 
     console.log("Done")

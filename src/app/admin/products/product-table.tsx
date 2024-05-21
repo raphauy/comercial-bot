@@ -10,6 +10,7 @@ import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRende
 import { DataTablePagination } from "@/components/data-table/data-table-pagination"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter"
+import { useSearchParams } from "next/navigation"
   
 interface DataTableToolbarProps<TData> {
   table: TanstackTable<TData>
@@ -105,10 +106,15 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  const searchParams= useSearchParams()
   React.useEffect(() => {
     columnsOff && columnsOff.forEach(colName => {
       table.getColumn(colName)?.toggleVisibility(false)      
     });
+    const codigo= searchParams.get("codigo")
+    codigo && table.getColumn("code")?.setFilterValue(codigo)
+
   // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, [])
 
