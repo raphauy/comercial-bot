@@ -157,3 +157,35 @@ const getBuyersOfProductByCategory=
         "required": ["categoryName"]
     }
 }
+
+const getClientsByDepartamento=
+{
+    "name": "getClientsByDepartamento",
+    "description": "Devuelve un array de clientes asociados de un determinado departamento. Ej: Montevideo, Canelones, Paysandú, etc. Importante: si el usuario escribe con tilde, debes modificar para que sea sin tilde. Ej: Paysandú cambia a Paysandu",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "departamento": {
+                "type": "string",
+                "description": "Nombre del departamento"
+            }
+        },
+        "required": ["departamento"]
+    }
+}
+
+const getClientsByLocalidad=
+{
+    "name": "getClientsByLocalidad",
+    "description": "Devuelve un array de clientes de una determinada localidad. Las localidades son regiones de los departamentos. Algunas coinciden con los nombres de los departamentos y otras no. Ej: Montevideo, Canelones, Paysandú, Balneario Buenos Aires, Bello Horizonte,etc.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "localidad": {
+                "type": "string",
+                "description": "Nombre de la localidad"
+            }
+        },
+        "required": ["localidad"]
+    }
+}

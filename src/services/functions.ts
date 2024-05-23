@@ -9,7 +9,7 @@ import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getFullComClientsDAOByVendor } from "./comclient-services";
+import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -302,6 +302,30 @@ export async function getBuyersOfProductByCategory(clientId: string, categoryNam
   return result
 }
 
+export async function getClientsByDepartamento(clientId: string, departamento: string) {
+  console.log("getClientsByDepartamento")
+  console.log(`\tdepartamento: ${departamento}`)
+  
+  const result= await getClientsByDepartamentoImpl(clientId, departamento)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetClientsByDepartamento: ${result.length} clientes encontrados`)  
+
+  return result
+}
+
+export async function getClientsByLocalidad(clientId: string, localidad: string) {
+  console.log("getClientsByLocalidad")
+  console.log(`\tlocalidad: ${localidad}`)
+  
+  const result= await getClientsByLocalidadImpl(clientId, localidad)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetClientsByLocalidad: ${result.length} clientes encontrados`)  
+
+  return result
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -374,6 +398,14 @@ export async function processFunctionCall(clientId: string, name: string, args: 
     
     case "getBuyersOfProductByCategory":
       content= await getBuyersOfProductByCategory(clientId, args.categoryName)
+      break
+
+    case "getClientsByDepartamento":
+      content= await getClientsByDepartamento(clientId, args.departamento)
+      break
+
+    case "getClientsByLocalidad":
+      content= await getClientsByLocalidad(clientId, args.localidad)
       break
   
     default:

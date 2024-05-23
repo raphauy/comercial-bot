@@ -167,6 +167,70 @@ export async function getFullComClientsDAOByVendor(clientId: string, vendorName:
  
   return clientsWithSellCounts as SellsCountResult[]
 }
+
+type ClientResult = {
+  codigo: string
+  nombre: string
+  departamento: string | null
+  localidad: string | null
+  direccion: string | null
+  telefono: string | null
+}
+
+
+export async function getClientsByDepartamentoImpl(clientId: string, departamento: string): Promise<ClientResult[]> {
+  const found = await prisma.comClient.findMany({
+    where: {
+      clientId: clientId,
+      departamento: {
+        equals: departamento.toLowerCase(),
+        mode: "insensitive"
+      }
+    },
+    include: {
+      client: true,
+      sells: true,
+    },
+    take: 10,
+  })
+
+  const res: ClientResult[] = found.map(client => ({
+    codigo: client.code,
+    nombre: client.name,
+    departamento: client.departamento,
+    localidad: client.localidad,
+    direccion: client.direccion,
+    telefono: client.telefono,
+  }))
+  return res
+}
+
+export async function getClientsByLocalidadImpl(clientId: string, localidad: string): Promise<ClientResult[]> {
+  const found = await prisma.comClient.findMany({
+    where: {
+      clientId: clientId,
+      localidad: {
+        equals: localidad.toLowerCase(),
+        mode: "insensitive"
+      }
+    },
+    include: {
+      client: true,
+      sells: true,
+    },
+    take: 10,
+  });
+
+  const res: ClientResult[] = found.map(client => ({
+    codigo: client.code,
+    nombre: client.name,
+    departamento: client.departamento,
+    localidad: client.localidad,
+    direccion: client.direccion,
+    telefono: client.telefono,
+  }))
+  return res
+}
   
 export async function getFullComClientDAO(id: string) {
   const found = await prisma.comClient.findUnique({
