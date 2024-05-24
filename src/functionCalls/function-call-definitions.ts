@@ -189,3 +189,19 @@ const getClientsByLocalidad=
         "required": ["localidad"]
     }
 }
+
+const getProductsRecomendationsForClient=
+{
+    "name": "getProductsRecomendationsForClient",
+    "description": "Devuelve un array de productos recomendados para un cliente en función de su historial de compras",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "clientName": {
+                "type": "string",
+                "description": "Nombre del cliente"
+            }
+        },
+        "required": ["clientName"]
+    }
+}

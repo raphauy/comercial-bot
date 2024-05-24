@@ -24,7 +24,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="w-full mt-4 space-y-8">      
             <h1 className="text-3xl font-bold text-center">Productos</h1>
 
-            <div className="container p-3 py-4 mx-auto bg-white border rounded-md text-muted-foreground dark:text-white">
+            <div className="container p-3 py-4 mx-auto bg-white border rounded-md dark:bg-black text-muted-foreground dark:text-white">
                 <DataTable columns={columns} data={data} subject="Producto" categories={uniqueCategories}/>
             </div>
 

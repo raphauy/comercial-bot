@@ -1,9 +1,10 @@
 import * as z from "zod"
 import { prisma } from "@/lib/db"
-import { CategoryDAO, CategoryFormValues, createCategory, getCategoryDAO, getCategoryDAOByName } from "./category-services"
+import { CategoryDAO, CategoryFormValues, createCategory, getCategoriesOfComClient, getCategoryDAO, getCategoryDAOByName } from "./category-services"
 import { getClient, getClientBySlug } from "./clientService"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
+import { clientSimilaritySearch, getFullComClientDAOByCode } from "./comclient-services"
 
 export type ProductDAO = {
 	id: string
@@ -266,6 +267,100 @@ export async function getFullProductDAOByCategoryName(clientId: string, category
     }
   })
   return res
+}
+
+export async function getAllProductsSoldToClient(clientId: string, comClientId: string) {
+  const found = await prisma.product.findMany({
+    where: {
+      clientId,
+      sells: {
+        some: {
+          comClientId
+        }
+      }
+    },
+    include: {
+			category: true,
+		}
+  })
+  const res: ProductDAO[] = found.map((product) => {
+    return {
+      ...product,
+      categoryName: product.category.name,
+    }
+  })
+  return res
+}
+
+export async function getComplmentaryProducts(clientId: string, productList: string[], categoryList: string[], limit: number = 10): Promise<ProductDAO[]> {
+  const found = await prisma.product.findMany({
+    where: {
+      clientId,
+      categoryId: {
+        in: categoryList
+      },
+      id: {
+        notIn: productList
+      }
+    },
+    include: {
+			category: true,
+		},
+    take: limit
+  })
+  const res: ProductDAO[] = found.map((product) => {
+    return {
+      ...product,
+      categoryName: product.category.name,
+    }
+  })
+  return res
+}
+
+export type ProductRecomendationResult = {
+	numeroRanking: string
+	codigo: string
+	nombre: string
+	stock: number
+	pedidoEnOrigen: number
+	precioUSD: number
+  familia: string
+}
+
+export async function getProductsRecomendationsForClientImpl(clientId: string, comClientName: string, limit: number = 10): Promise<ProductRecomendationResult[]> {
+  const similarityResult= await clientSimilaritySearch(clientId, comClientName)
+  if (similarityResult.length === 0) {
+      throw new Error(`client ${comClientName} not found`)
+  } else {
+      const firstClient = similarityResult[0]
+      console.log("searching recomendations for client:", firstClient.name)
+      const comClient= await getFullComClientDAOByCode(firstClient.code, clientId)
+      if (!comClient) throw new Error(`client ${comClientName} not found`)
+  
+      const categoriesOfVendor= await getCategoriesOfComClient(clientId, comClient.id)
+      const categoriesList= categoriesOfVendor.map(category => category.id)
+
+      const productsSoldToClient= await getAllProductsSoldToClient(clientId, comClient.id)
+      const productsList= productsSoldToClient.map(product => product.id)
+      
+      const complementaryProducts= await getComplmentaryProducts(clientId, productsList, categoriesList, limit)
+      for (const product of complementaryProducts) {
+        console.log(product.externalId, product.code, product.name, product.categoryName)        
+      }
+      const result: ProductRecomendationResult[] = []
+      for (const product of complementaryProducts) {
+        result.push({
+          numeroRanking: product.externalId,
+          codigo: product.code,
+          nombre: product.name,
+          stock: product.stock,
+          pedidoEnOrigen: product.pedidoEnOrigen,
+          precioUSD: product.precioUSD,
+          familia: product.categoryName
+        })
+    }
+      return result
+  }
 }
 
 async function embedAndSave(text: string, productId: string) {

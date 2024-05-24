@@ -169,9 +169,6 @@ export async function vendorSimilaritySearch(clientId: string, text: string, lim
     ORDER BY distance
     LIMIT ${limit}`;
 
-    console.log(similarityResult)
-    
-
   const result: SimilarityVendorResult[] = [];
   for (const row of similarityResult) {
     result.push({

@@ -102,3 +102,24 @@ export async function getFullCategoryDAO(id: string) {
   return found as CategoryDAO
 }
     
+
+export async function getCategoriesOfComClient(clientId: string, comClientId: string) {
+  const found = await prisma.category.findMany({
+    where: {
+      clientId,
+      products: {
+        some: {
+          sells: {
+            some: {
+              comClientId
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      name: 'asc'
+    }    
+  })
+  return found as CategoryDAO[]
+}

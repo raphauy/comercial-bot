@@ -8,7 +8,7 @@ import { SummitFormValues, createSummit } from "./summit-services";
 import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, productSimilaritySearch } from "./product-services";
+import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl } from "./comclient-services";
 
 export type CompletionInitResponse = {
@@ -326,6 +326,26 @@ export async function getClientsByLocalidad(clientId: string, localidad: string)
   return result
 }
 
+export async function getProductsRecomendationsForClient(clientId: string, clientName: string) {
+  console.log("getProductsRecomendationsForClient")
+  console.log(`\tclientName: ${clientName}`)
+  
+  try {
+    const result= await getProductsRecomendationsForClientImpl(clientId, clientName)
+    if (!result || result.length === 0) return "No se encontraron productos"
+
+    console.log(`\tgetProductsRecomendationsForClient: ${result.length} productos encontrados`)  
+  
+    return result
+
+    } catch (error) {    
+      if (error instanceof Error) {
+        return error.message
+      }
+      return 'Ocurrió un error inesperado'
+    }
+}
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -407,6 +427,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
     case "getClientsByLocalidad":
       content= await getClientsByLocalidad(clientId, args.localidad)
       break
+
+    case "getProductsRecomendationsForClient":
+      content= await getProductsRecomendationsForClient(clientId, args.clientName)
+      break      
   
     default:
       break
