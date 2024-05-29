@@ -192,7 +192,8 @@ export async function getFullProductDAOByExternalId(externalId: string, clientId
 		}
   })
   if (!found) {
-    throw new Error("product not found")
+    return null
+    // throw new Error("product not found")
   }
   const res: ProductDAO = {
     ...found,
