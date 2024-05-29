@@ -205,3 +205,46 @@ const getProductsRecomendationsForClient=
         "required": ["clientName"]
     }
 }
+  
+const getTopBuyers=
+{
+    "name": "getTopBuyers",
+    "description": "Devuelve un array de clientes ordenados por la cantidad de ventas totales.",
+    "parameters": {}
+}
+
+const getTopBuyersByDepartamento=
+{
+    "name": "getTopBuyersByDepartamento",
+    "description": "Devuelve un array de clientes de un determinado departamento ordenados por la cantidad de ventas.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "departamento": {
+                "type": "string",
+                "description": "Nombre del departamento"
+            }
+        },
+        "required": ["departamento"]
+    }
+}
+
+const getTopBuyersByDepartamentoAndVendor=
+{
+    "name": "getTopBuyersByDepartamentoAndVendor",
+    "description": "Devuelve un array de clientes de un determinado departamento y vendedor ordenados por la cantidad de ventas.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "departamento": {
+                "type": "string",
+                "description": "Nombre del departamento"
+            },
+            "vendorName": {
+                "type": "string",
+                "description": "Nombre del vendedor"
+            }
+        },
+        "required": ["departamento", "vendorName"]
+    }
+}

@@ -434,6 +434,144 @@ export async function getBuyersOfProductByCategoryImpl(clientId: string, categor
   return clientsWithSellCounts as BuyCountResult[]
 }
 
+export async function getTopBuyersImpl(clientId: string, take: number = 10): Promise<BuyCountResult[]> {
+  // get top 10 buyers based on the quantity of products sold
+  const clients = await prisma.comClient.findMany({
+    where: {
+      clientId,
+    },
+    include: {
+      sells: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  })
+
+  const topBuyers = clients
+    .map(client => ({
+      ...client,
+      totalQuantity: client.sells.reduce((total, sell) => total + sell.quantity, 0),
+    }))
+    .sort((a, b) => b.totalQuantity - a.totalQuantity)
+    .slice(0, take)
+
+  const clientsWithSellCounts = topBuyers.map(client => ({
+    cantCompras: client.sells.reduce((acc, sell) => acc + sell.quantity, 0),
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    },
+  }))
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
+
+export async function getTopBuyersByDepartamentoImpl(clientId: string, departamento:string, take: number = 10): Promise<BuyCountResult[]> {
+  // get top 10 buyers of a specific departamento based on the quantity of products sold
+  const clients = await prisma.comClient.findMany({
+    where: {
+      clientId,
+      departamento: {
+        equals: departamento.toLowerCase(),
+        mode: "insensitive"
+      }
+    },
+    include: {
+      sells: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  })
+
+  const topBuyers = clients
+    .map(client => ({
+      ...client,
+      totalQuantity: client.sells.reduce((total, sell) => total + sell.quantity, 0),
+    }))
+    .sort((a, b) => b.totalQuantity - a.totalQuantity)
+    .slice(0, take)
+
+  const clientsWithSellCounts = topBuyers.map(client => ({
+    cantCompras: client.sells.reduce((acc, sell) => acc + sell.quantity, 0),
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    },
+  }))
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
+
+export async function getTopBuyersByDepartamentoAndVendorImpl(clientId: string, departamento:string, vendorName: string, take: number = 10) {
+  // get top 10 buyers of a specific departamento and vendor based on the quantity of products sold
+  const similarityVendors= await vendorSimilaritySearch(clientId, vendorName, 1)
+  const similarityVendor= similarityVendors[0]
+  if (similarityVendor) {
+    vendorName= similarityVendor.nombre
+  }
+  console.log(`Vendor name: ${vendorName}`)
+  
+  const vendor= await getFullVendorDAOByName(clientId, vendorName)
+  if (!vendor) return "No se encontró un vendedor con el nombre: " + vendorName
+  console.log(`Vendor: ${JSON.stringify(vendor)}`)
+  
+  const clients = await prisma.comClient.findMany({
+    where: {
+      clientId,
+      departamento: {
+        equals: departamento.toLowerCase(),
+        mode: "insensitive"
+      },
+      vendors: {
+        some: {
+          vendorId: vendor.id
+        }
+      }
+    },
+    include: {
+      sells: {
+        include: {
+          product: true,
+        },
+      }
+		},
+  })
+
+  const topBuyers = clients
+    .map(client => ({
+      ...client,
+      totalQuantity: client.sells.reduce((total, sell) => total + sell.quantity, 0),
+    }))
+    .sort((a, b) => b.totalQuantity - a.totalQuantity)
+    .slice(0, take)
+
+  const clientsWithSellCounts = topBuyers.map(client => ({
+    cantCompras: client.sells.reduce((acc, sell) => acc + sell.quantity, 0),
+    cliente: {
+      codigo: client.code,
+      nombre: client.name,
+      departamento: client.departamento,
+      localidad: client.localidad,
+      direccion: client.direccion,
+      telefono: client.telefono,
+    },
+  }))
+
+  return clientsWithSellCounts as BuyCountResult[]
+}
+
 async function embedAndSave(text: string, comClientId: string) {
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY_FOR_EMBEDDINGS,

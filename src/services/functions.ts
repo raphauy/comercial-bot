@@ -9,7 +9,7 @@ import { getConversation, messageArrived } from "./conversationService";
 import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl } from "./comclient-services";
+import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl, getTopBuyersImpl, getTopBuyersByDepartamentoImpl, getTopBuyersByDepartamentoAndVendorImpl } from "./comclient-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -346,6 +346,31 @@ export async function getProductsRecomendationsForClient(clientId: string, clien
     }
 }
 
+export async function getTopBuyers(clientId: string) {
+  const result = await getTopBuyersImpl(clientId, 10)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetTopBuyers: ${result.length} clientes encontrados`)  
+  return result
+}
+
+export async function getTopBuyersByDepartamento(clientId: string, departamento: string) {
+  const result = await getTopBuyersByDepartamentoImpl(clientId, departamento, 10)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetTopBuyersByDepartamento: ${result.length} clientes encontrados`)  
+  return result
+}
+
+export async function getTopBuyersByDepartamentoAndVendor(clientId: string, departamento: string, vendorName: string) {
+  const result = await getTopBuyersByDepartamentoAndVendorImpl(clientId, departamento, vendorName, 10)
+  if (!result || result.length === 0) return "No se encontraron clientes"
+
+  console.log(`\tgetTopBuyersByDepartamentoAndVendor: ${result.length} clientes encontrados`)  
+  return result
+}
+
+
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
 
@@ -367,17 +392,13 @@ export async function processFunctionCall(clientId: string, name: string, args: 
     case "getSection":
       content= await getSection(args.docId, args.secuence)
       break
+
     case "echoRegister":
-      content= echoRegister(clientId, 
-        args.conversationId, 
-        decodeAndCorrectText(args.text)
-      )
+      content= echoRegister(clientId, args.conversationId, decodeAndCorrectText(args.text))
       break
+
     case "completarFrase":
-      content= completarFrase(clientId, 
-        args.conversationId, 
-        decodeAndCorrectText(args.texto)        
-      )
+      content= completarFrase(clientId, args.conversationId, decodeAndCorrectText(args.texto))
       break
 
     case "getProductByCode":
@@ -430,7 +451,19 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getProductsRecomendationsForClient":
       content= await getProductsRecomendationsForClient(clientId, args.clientName)
-      break      
+      break
+
+    case "getTopBuyers":
+      content= await getTopBuyers(clientId)
+      break
+
+    case "getTopBuyersByDepartamento":
+      content= await getTopBuyersByDepartamento(clientId, args.departamento)
+      break
+
+    case "getTopBuyersByDepartamentoAndVendor":
+      content= await getTopBuyersByDepartamentoAndVendor(clientId, args.departamento, args.vendorName)
+      break
   
     default:
       break
