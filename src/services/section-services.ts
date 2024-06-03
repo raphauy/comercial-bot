@@ -200,7 +200,7 @@ export async function similaritySearch(clientId: string, text: string, limit: nu
     SELECT s."id", d."id" as "docId", d."name", s."text", s."secuence", s."embedding" <-> ${textEmbedding}::vector AS distance
     FROM "Section" AS s
     INNER JOIN "Document" AS d ON s."documentId" = d."id"
-    WHERE d."clientId" = ${clientId} AND s."embedding" <-> ${textEmbedding}::vector < 1.05
+    WHERE d."clientId" = ${clientId} AND s."embedding" <-> ${textEmbedding}::vector < 1.3
     ORDER BY distance
     LIMIT ${limit}`;
 

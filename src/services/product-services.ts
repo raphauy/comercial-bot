@@ -405,7 +405,7 @@ export async function productSimilaritySearch(clientId: string, text: string, li
     SELECT p."externalId", p."code", p."name", p."stock", p."pedidoEnOrigen", p."precioUSD", c."name" AS "categoryName", p."embedding" <-> ${textEmbedding}::vector AS distance
     FROM "Product" AS p
     INNER JOIN "Category" AS c ON p."categoryId" = c."id" 
-    WHERE p."clientId" = ${clientId} AND p."embedding" <-> ${textEmbedding}::vector < 1.05
+    WHERE p."clientId" = ${clientId} AND p."embedding" <-> ${textEmbedding}::vector < 1.3
     ORDER BY distance
     LIMIT ${limit}`;
 

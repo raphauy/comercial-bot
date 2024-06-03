@@ -612,7 +612,7 @@ export async function clientSimilaritySearch(clientId: string, text: string, lim
   const similarityResult: any[] = await prisma.$queryRaw`
     SELECT c."id", c."code", c."name", c."departamento", c."localidad", c."direccion", c."telefono", c."embedding" <-> ${textEmbedding}::vector AS distance 
     FROM "ComClient" AS c
-    WHERE c."clientId" = ${clientId} AND c."embedding" <-> ${textEmbedding}::vector < 1.05
+    WHERE c."clientId" = ${clientId} AND c."embedding" <-> ${textEmbedding}::vector < 1.3
     ORDER BY distance
     LIMIT ${limit}`;
 
