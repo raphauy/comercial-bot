@@ -1,15 +1,13 @@
 import { getCurrentUser } from "@/lib/auth";
-import { removeSectionTexts } from "@/lib/utils";
 import { getClient } from "@/services/clientService";
 import { getSystemMessage, messageArrived } from "@/services/conversationService";
-import { getFunctionsDefinitions } from "@/services/function-services";
+import { getContext, getFunctionsDefinitions } from "@/services/function-services";
+import { processFunctionCall } from "@/services/functions";
 import { getFullModelDAO, getFullModelDAOByName } from "@/services/model-services";
-import { getContext, setSectionsToMessage } from "@/services/section-services";
 import { OpenAIStream, StreamingTextResponse } from "ai";
+import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 import openaiTokenCounter from 'openai-gpt-token-counter';
-import { NextResponse } from "next/server";
-import { processFunctionCall } from "@/services/functions";
 
 export const maxDuration = 59; // This function can run for a maximum of 30 seconds
 export const dynamic = 'force-dynamic';
@@ -50,13 +48,14 @@ export async function POST(req: Request) {
   
   if (!provider.streaming || !model.streaming) return NextResponse.json({ error: "Proveedor o modelo no soporta streaming" }, { status: 502 })
 
-  const contextResponse= await getContext(clientId, phone, input)
-  console.log("contextContent: " + removeSectionTexts(contextResponse.contextString))
+  const contextString= await getContext(clientId, phone)
+  console.log("contextString:")
+  console.log(contextString)
+ 
 
-  const systemMessage= getSystemMessage(client.prompt, contextResponse.contextString)
+  const systemMessage= getSystemMessage(client.prompt, contextString)
   messages.unshift(systemMessage)
   const created= await messageArrived(phone, systemMessage.content, client.id, "system", "")
-  await setSectionsToMessage(created.id, contextResponse.sectionsIds)
 
   console.log("messages.count: " + messages.length)
 

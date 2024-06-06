@@ -248,3 +248,39 @@ const getTopBuyersByDepartamentoAndVendor=
         "required": ["departamento", "vendorName"]
     }
 }
+
+const insertLead= 
+{
+    "name": "insertLead",
+    "description": "Inserta un nuevo lead en la base de datos",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "conversationId": {
+                "type": "string",
+                "description": "Identificador de la conversación que va en el prompt."
+            },
+            "name": {
+                "type": "string",
+                "description": "Nombre del usuario"
+            },
+            "companyName": {
+                "type": "string",
+                "description": "Nombre de la empresa si el usuario tiene una. También se le llama Razón Social. Se debe manejar el término Razón Social al dialogar con el usuario"
+            },
+            "rutOrCI": {
+                "type": "string",
+                "description": "RUT de la empresa si el usuario tiene una, en caso contrario solicitar la CI (cédula de identidad)"
+            },
+            "phone": {
+                "type": "string",
+                "description": "Teléfono el usuario, este campo no se debe preguntar al usuario ya que está en el prompt, pero se debe llenar este campo con el número de teléfono del usuario"
+            },
+            "address": {
+                "type": "string",
+                "description": "Dirección de la empresa si el usuario tiene una, en caso contrario será la dirección del usuario"
+            }
+        },
+        "required": ["conversationId", "name", "rutOrCI", "phone", "address"]
+    }
+}

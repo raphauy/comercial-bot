@@ -10,6 +10,7 @@ import { CarServiceFormValues, createCarService } from "./carservice-services";
 import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl, getTopBuyersImpl, getTopBuyersByDepartamentoImpl, getTopBuyersByDepartamentoAndVendorImpl } from "./comclient-services";
+import { LeadFormValues, createLead } from "./lead-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -370,6 +371,34 @@ export async function getTopBuyersByDepartamentoAndVendor(clientId: string, depa
   return result
 }
 
+export async function insertLead(clientId: string, conversationId: string, name: string, companyName: string, rutOrCI: string, phone: string, address: string) {
+  console.log("insertLead")
+  console.log(`\tname: ${name}`)
+  console.log(`\tconversationId: ${conversationId}`)
+  console.log(`\tcompanyName: ${companyName}`)
+  console.log(`\trutOrCI: ${rutOrCI}`)
+  console.log(`\tphone: ${phone}`)
+  console.log(`\taddress: ${address}`)
+
+  if (!name || !rutOrCI || !phone || !address || !conversationId) {
+    return "Error al insertar, name, rutOrCI, phone, address y conversationId son obligatorios"
+  }
+
+  const leadForm: LeadFormValues = {
+    name,
+    companyName,
+    rutOrCI,
+    phone,
+    address,
+    conversationId: conversationId,
+  }
+
+  const created= await createLead(leadForm)
+  if (!created) return "Hubo un error al insertar el lead"
+
+  return "Lead insertado correctamente"
+}
+
 
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
@@ -463,6 +492,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "getTopBuyersByDepartamentoAndVendor":
       content= await getTopBuyersByDepartamentoAndVendor(clientId, args.departamento, args.vendorName)
+      break
+
+    case "insertLead":
+      content= await insertLead(clientId, args.conversationId, args.name, args.companyName, args.rutOrCI, args.phone, args.address)
       break
   
     default:

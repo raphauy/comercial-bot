@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { getFormat, removeSectionTexts } from "@/lib/utils";
+import { getFormat } from "@/lib/utils";
 import { useChat } from "ai/react";
 import clsx from "clsx";
 import { Bot, CircleDollarSign, Loader, SendIcon, Terminal, Ticket, User } from "lucide-react";
@@ -224,7 +224,7 @@ export default function Chat() {
                     <AccordionTrigger onTransitionEnd={() => loadSections(message.id)}>Prompt</AccordionTrigger>
                     <AccordionContent>
                       <div className="whitespace-pre-line">
-                        {removeSectionTexts(message.content)}                      
+                        {message.content}                      
                       </div>
                       <div className="flex flex-col gap-2 mt-10">
                         <p className="mb-3 text-base font-bold">Mejores Secciones para este input:</p>

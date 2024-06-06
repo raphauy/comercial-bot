@@ -11,7 +11,7 @@ import { getFormat } from "@/lib/utils";
 import { ModelDAO } from "@/services/model-services";
 import { useChat } from "ai/react";
 import clsx from "clsx";
-import { Bot, Car, CircleDollarSign, Loader, Podcast, SendIcon, Terminal, Ticket, User } from "lucide-react";
+import { Bot, Car, CircleDollarSign, Loader, Magnet, Podcast, SendIcon, Terminal, Ticket, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -331,6 +331,12 @@ export default function SimulatorBox() {
           {customInfo?.carServiceName &&
             <Link href={`/client/${slug}/car-service?name=${customInfo.carServiceName}`}>
               <Button variant="ghost" className="h-3"><Car /></Button>
+            </Link>
+          }
+          {
+            customInfo?.leadId &&
+            <Link href={`/client/${slug}/leads?leadId=${customInfo.leadId}`}>
+              <Button variant="ghost" className="h-3"><Magnet /></Button>
             </Link>
           }
           

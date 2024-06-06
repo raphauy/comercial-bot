@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils";
-import { BookOpen, Bot, Car, ChevronRightSquare, LayoutDashboard, LucideBriefcase, MessageCircle, Receipt, Scan, ShoppingBag, Tag, Ticket, User, Users, Warehouse } from "lucide-react";
+import { BookOpen, Bot, Car, ChevronRightSquare, LayoutDashboard, LucideBriefcase, Magnet, MessageCircle, Receipt, Scan, ShoppingBag, Tag, Ticket, User, Users, Warehouse } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,8 +9,9 @@ interface Props {
   slug: string
   showRegistro?: boolean
   showCarServices?: boolean
+  showLeads?: boolean
 }
-export default function SideBar({ slug, showRegistro, showCarServices }: Props) {
+export default function SideBar({ slug, showRegistro, showCarServices, showLeads }: Props) {
 
   const data= [
     {
@@ -140,6 +141,16 @@ export default function SideBar({ slug, showRegistro, showCarServices }: Props) 
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Vendedores</p>
         </Link>
+
+        {divider()}
+
+        <Link href={`/client/${slug}/leads`} className={cn(commonClasses, path.endsWith("leads") && selectedClasses, !showLeads && "hidden")}>
+          <div className="pb-1">
+          <Magnet size={23} />
+          </div>
+          <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Leads</p>                  
+        </Link>
+
 
       </section>
     </div>

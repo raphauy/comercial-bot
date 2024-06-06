@@ -143,6 +143,7 @@ model Conversation {
   narvaez     Narvaez?
   summit      Summit?
   carService  CarService?
+  lead        Lead?
 }
 
 model Message {
@@ -393,4 +394,19 @@ model ComClientVendor {
   vendor        Vendor    @relation(fields: [vendorId], references: [id])
 
   @@id([comClientId, vendorId])
+}
+
+model Lead {
+  id                  String        @id @default(cuid())
+  name                String                               // gennext: show.column
+  companyName         String?                              // gennext: show.column
+  rutOrCI             String                              // gennext: show.column
+  phone               String                              // gennext: show.column
+  address             String                              // gennext: show.column
+
+  createdAt           DateTime     @default(now())         // gennext: skip.zod
+  updatedAt           DateTime     @updatedAt              // gennext: skip.zod show.column
+
+  conversation        Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId     String @unique
 }

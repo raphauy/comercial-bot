@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/db";
 
 import { BillingData, CompleteData } from "@/app/admin/billing/actions";
-import { removeSectionTexts } from "@/lib/utils";
 import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
-import { getFunctionsDefinitions } from "./function-services";
+import { getContext, getFunctionsDefinitions } from "./function-services";
 import { sendWapMessage } from "./osomService";
-import { getContext, setSectionsToMessage } from "./section-services";
 import { googleCompletionInit } from "./google-function-call-services";
 import { ChatCompletion } from "groq-sdk/resources/chat/completions.mjs";
 import { getFullModelDAO, getFullModelDAOByName } from "./model-services";
@@ -201,10 +199,9 @@ export async function processMessage(id: string, modelName?: string) {
   if (!client.prompt) throw new Error("Client prompt not found")
   const input= message.content
 
-  const contextResponse= await getContext(client.id, conversation.phone, input)
-  console.log("contextContent: " + removeSectionTexts(contextResponse.contextString))
+  const contextString= await getContext(client.id, conversation.phone)
 
-  const systemMessage= getSystemMessage(client.prompt, contextResponse.contextString)
+  const systemMessage= getSystemMessage(client.prompt, contextString)
 
   const filteredMessages= conversation.messages.filter((message) => message.role !== "system")
   const messages: ChatCompletionMessageParam[]= getGPTMessages(filteredMessages as ChatCompletionUserOrSystem[], systemMessage)
@@ -216,7 +213,7 @@ export async function processMessage(id: string, modelName?: string) {
   }  
 
   const created= await messageArrived(conversation.phone, systemMessage.content, client.id, "system", "")
-  await setSectionsToMessage(created.id, contextResponse.sectionsIds)
+  //await setSectionsToMessage(created.id, contextResponse.sectionsIds)
 
   console.log("messages.count: " + messages.length)
 

@@ -283,6 +283,20 @@ export async function getComClientDAOByCode(clientId: string, code: string) {
   
 }
 
+export async function getComClientDAOByPhone(clientId: string, phone: string) {
+  let found = await prisma.comClient.findFirst({
+    where: {
+      clientId,
+      telefono: phone
+    },
+  })
+  if (found) {
+    return found
+  }
+
+  return found
+}
+
 type BuyCountResult = {
 	cantCompras: number
 	cliente: {

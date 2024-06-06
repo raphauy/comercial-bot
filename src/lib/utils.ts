@@ -28,18 +28,6 @@ export function formatPresupuesto(presupuestoStr: string | undefined) {
   return `${presupuestoFormateado} ${monedaOut}`
 }
 
-export function removeSectionTexts(inputText: string): string {
-  // Expresión regular que identifica el patrón, incluyendo saltos de línea
-  // Uso de [\s\S]*? para coincidir con cualquier carácter incluyendo saltos de línea de forma no ávida
-  const regex = /Text: ".*?",\n/gs;
-
-  // Reemplazar las coincidencias encontradas por la cadena vacía
-  const resultText = inputText.replace(regex, '');
-
-  return resultText;
-}
-  
-
 export function getFormat(date: Date): string {
   const timeZone = "America/Montevideo";
   

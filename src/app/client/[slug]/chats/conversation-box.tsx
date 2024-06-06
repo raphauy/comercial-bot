@@ -3,9 +3,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { removeSectionTexts } from "@/lib/utils"
 import clsx from "clsx"
-import { Bot, Car, CircleDollarSign, Terminal, Ticket, User } from "lucide-react"
+import { Bot, Car, CircleDollarSign, Magnet, Terminal, Ticket, User } from "lucide-react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -64,6 +63,12 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
             {customInfo?.carServiceName &&
               <Link href={`/client/${slug}/car-service?name=${customInfo.carServiceName}`}>
                 <Button variant="ghost" className="h-7"><Car /></Button>
+              </Link>
+            }
+            {
+              customInfo?.leadId &&
+              <Link href={`/client/${slug}/leads?leadId=${customInfo.leadId}`}>
+                <Button variant="ghost" className="h-7"><Magnet /></Button>
               </Link>
             }
           </div>
@@ -128,7 +133,7 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
                       <AccordionTrigger>Prompt</AccordionTrigger>
                       <AccordionContent>
                         <div className="whitespace-pre-line">
-                          {removeSectionTexts(message.content)}
+                          {message.content}
                         </div>
                       </AccordionContent>
                     </AccordionItem>

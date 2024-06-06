@@ -2,6 +2,12 @@ import * as z from "zod"
 import { prisma } from "@/lib/db"
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { Client } from "@prisma/client"
+import { getDocumentsDAOByClient } from "./document-services"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { getActiveConversation } from "./conversationService"
+import { getFunctionsOfClient } from "./clientService"
+import { getComClientDAOByPhone } from "./comclient-services"
 
 export type FunctionDAO = {
 	id: string
@@ -105,4 +111,68 @@ export async function getClientsOfFunctionByName(name: string): Promise<Client[]
   })
 
   return found.map((f) => f.client)
+}
+
+export async function getContext(clientId: string, phone: string) {
+
+  const functioins= await getFunctionsOfClient(clientId)
+  const functionsNames= functioins.map((f) => f.name)
+
+  let contextString= "Hablas correctamente el español, incluyendo el uso adecuado de tildes y eñes.\nPor favor, utiliza solo caracteres compatibles con UTF-8 y adecuados para el idioma español.\n"
+
+  if (functionsNames.includes("insertLead") || functionsNames.includes("echoRegister")) {
+    const conversation= await getActiveConversation(phone, clientId)
+    if (conversation) {
+      contextString+= "\nconversationId: " + conversation.id + "\n"
+    }
+  }
+
+  if (functionsNames.includes("getDateOfNow")) {
+    contextString+= "\n**** Fecha y hora ****\n"
+    const hoy= format(new Date(), "EEEE, dd/MM/yyyy HH:mm:ss", {locale: es})
+    contextString+= `Hoy es ${hoy}.\n`
+  }
+
+  if (functionsNames.includes("getDocument")) {
+    const documents= await getDocumentsDAOByClient(clientId)
+    contextString+= "\n**** Documentos ****\n"
+    contextString+= "Documentos que pueden ser relevantes para elaborar una respuesta:\n"
+    documents.map((doc) => {
+      contextString += `
+      {
+        docId: "${doc.id}",
+        docName: "${doc.name}",
+        docDescription: "${doc.description}",
+        docURL: "${doc.url}",
+        sectionsCount: ${doc.sectionsCount}
+      },`
+    })
+
+  }
+
+  if (functionsNames.includes("insertLead")) {
+    const comClient= await getComClientDAOByPhone(clientId, phone)
+    contextString+= "\n**** Datos del usuario ****\n"
+    contextString+= `Phone: ${phone}\n`
+    if (!comClient) {
+      contextString+= "No se encontró ningún cliente con el número de teléfono: " + phone + ".\n"
+      contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
+    } else {
+      contextString+= `El usuario es un cliente, estos son sus datos:\n`
+      contextString+= `{
+        nombre: ${comClient.name},
+        codigo: ${comClient.code},
+        departamento: ${comClient.departamento},
+        localidad: ${comClient.localidad},
+        direccion: ${comClient.direccion},
+        telefono: ${comClient.telefono}
+      }\n`
+      contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
+    }
+
+    contextString+= "\n***************************\n"
+  }
+
+
+  return contextString
 }

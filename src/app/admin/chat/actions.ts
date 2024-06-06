@@ -2,6 +2,7 @@
 
 import { getServiceNameByConversationId } from "@/services/carservice-services"
 import { getActiveMessages } from "@/services/conversationService"
+import { getLeadIdByConversationId } from "@/services/lead-services"
 import { getSectionsOfMessage } from "@/services/section-services"
 import { getSummitIdByConversationId } from "@/services/summit-services"
 
@@ -21,17 +22,20 @@ export type CustomInfo = {
     narvaezId: string | undefined
     summitId: string | undefined
     carServiceName: string | undefined
+    leadId: string | undefined
 }
 
 export async function getCustomInfoAction(conversationId: string): Promise<CustomInfo>{
     const narvaezId= "narvaezId"
     const summitId= await getSummitIdByConversationId(conversationId)
     const carServiceName= await getServiceNameByConversationId(conversationId)
+    const leadId= await getLeadIdByConversationId(conversationId)
 
     const res= {
         narvaezId,
         summitId,
-        carServiceName
+        carServiceName,
+        leadId,
     }
 
     return res
