@@ -246,6 +246,7 @@ export async function processMessage(id: string, modelName?: string) {
   let assistantResponse= completionResponse.assistantResponse
   const gptData= null
   const notificarAgente= completionResponse.agentes
+  const notificarLead= completionResponse.leads
   const promptTokens= completionResponse.promptTokens
   const completionTokens= completionResponse.completionTokens
 
@@ -259,7 +260,7 @@ export async function processMessage(id: string, modelName?: string) {
     await messageArrived(conversation.phone, assistantResponse, conversation.clientId, "assistant", gptDataString, promptTokens, completionTokens)
 
     console.log("notificarAgente: " + notificarAgente)    
-    sendWapMessage(conversation.phone, assistantResponse, notificarAgente, conversation.clientId)
+    sendWapMessage(conversation.phone, assistantResponse, notificarAgente, notificarLead, conversation.clientId)
   }
 
   // if (assistantResponse) {

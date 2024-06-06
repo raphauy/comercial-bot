@@ -17,6 +17,7 @@ export type CompletionInitResponse = {
   promptTokens: number
   completionTokens: number
   agentes: boolean  
+  leads: boolean
 }
 
 export type DocumentResult = {
@@ -509,7 +510,7 @@ export async function processFunctionCall(clientId: string, name: string, args: 
   }
 }
 
-export function getAgentes(name: string): boolean {
+export function notifyAgentes(name: string): boolean {
   let res= false
   switch (name) {
     case "notifyHuman":
@@ -521,3 +522,14 @@ export function getAgentes(name: string): boolean {
   return res
 }
 
+export function notifyLead(name: string): boolean {
+  let res= false
+  switch (name) {
+    case "insertLead":
+      res= true
+      break
+    default:
+      break
+  }
+  return res
+}

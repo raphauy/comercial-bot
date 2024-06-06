@@ -11,6 +11,7 @@ import CopyHook from "./copy-hook"
 import { getClientBySlug, getFunctionsOfClient } from "@/services/clientService"
 import DocumentsHook from "./documents-hook"
 import ComercialHook from "./comercial-hook"
+import LeadHook from "./leads-hook"
 
 type Props = {
     searchParams: {
@@ -29,6 +30,7 @@ export default async function ConfigPage({ searchParams }: Props) {
     const summitClient= await getClientBySlug("summit")
     const functionsOfClient= await getFunctionsOfClient(clientId)
     const haveCarServiceFunction= functionsOfClient.find((f) => f.name === "reservarServicio") !== undefined
+    const haveInsertLeadFunction= functionsOfClient.find((f) => f.name === "insertLead") !== undefined
 
     const BASE_PATH= process.env.NEXTAUTH_URL || "NOT-CONFIGURED"
 
@@ -59,10 +61,16 @@ export default async function ConfigPage({ searchParams }: Props) {
                     <DocumentsHook basePath={BASE_PATH} />
                     <CopyHook name="Narvaez Entry" path={`${BASE_PATH}/api/${narvaezClient?.id}/narvaez`} clientId={narvaezClient?.id || ""} />
                     <CopyHook name="Summit Entry" path={`${BASE_PATH}/api/${summitClient?.id}/summit`} clientId={summitClient?.id || ""} />
-                    { haveCarServiceFunction && 
+                    <ComercialHook basePath={BASE_PATH} />
+                    { 
+                        haveCarServiceFunction && 
                         <CopyHook name="Car Service Entry" path={`${BASE_PATH}/api/${client.id}/car-service`} clientId={client.id} />
                     }
-                    <ComercialHook basePath={BASE_PATH} />
+                    {
+                        haveInsertLeadFunction && 
+                        <LeadHook basePath={BASE_PATH} />
+                        
+                    }
                 </TabsContent>
                 <TabsContent value="general">
                     <ConfigsPage />

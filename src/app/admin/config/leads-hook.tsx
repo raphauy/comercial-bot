@@ -8,7 +8,7 @@ interface Props {
     basePath: string
 }
 
-export default function ComercialHook({ basePath }: Props) {
+export default function LeadHook({ basePath }: Props) {
 
     const [clientId, setClientId]= useState("") 
 
@@ -23,9 +23,8 @@ export default function ComercialHook({ basePath }: Props) {
 
     return (
         <div className="w-full p-4 mt-2 border rounded-lg">
-            <p className="text-2xl font-bold">Ventas Hooks</p>
-            <SimpleCopyHook name="update products" path={`${basePath}/api/${clientId}/products/update`} />
-            <SimpleCopyHook name="update sells" path={`${basePath}/api/${clientId}/sells/update`} />
+            <p className="text-2xl font-bold">Lead Hook</p>
+            <SimpleCopyHook name="getLead" path={`${basePath}/api/${clientId}/leads`} />
         </div>
     )
 }

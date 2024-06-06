@@ -42,6 +42,18 @@ export async function getLeadDAO(id: string) {
   })
   return found as LeadDAO
 }
+
+export async function getLeadByPhoneDAO(clientId: string, phone: string) {
+  const found = await prisma.lead.findFirst({
+    where: {
+      conversation: {
+        clientId,
+        phone
+      }
+    },
+  })
+  return found as LeadDAO
+}
     
 export async function createLead(data: LeadFormValues) {
   // TODO: implement createLead
