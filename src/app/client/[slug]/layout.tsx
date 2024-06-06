@@ -46,10 +46,16 @@ export default async function SlugLayout({ children, params }: Props) {
   const clinetsOfLeads= await getClientsOfFunctionByName("insertLead")
   const showLeads= clinetsOfLeads.map(c => c.slug).includes(slug)
 
+  const clientsOfSellStuff= await getClientsOfFunctionByName("getTopBuyers")
+  const showSellStuff= clientsOfSellStuff.map(c => c.slug).includes(slug)
+
+  const clientsOfDocumens= await getClientsOfFunctionByName("getDocument")
+  const showDocuments= clientsOfDocumens.map(c => c.slug).includes(slug)
+
   return (
     <>
       <div className="flex flex-grow w-full">
-        <SideBar slug={slug} showRegistro={showRegistro} showCarServices={showCarServices} showLeads={showLeads} />
+        <SideBar slug={slug} showRegistro={showRegistro} showCarServices={showCarServices} showLeads={showLeads} showSellStuff={showSellStuff} showDocuments={showDocuments} />
         <div className="flex flex-col items-center flex-grow p-1">
           <TooltipProvider>
             {children}

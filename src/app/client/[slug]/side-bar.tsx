@@ -10,8 +10,10 @@ interface Props {
   showRegistro?: boolean
   showCarServices?: boolean
   showLeads?: boolean
+  showSellStuff?: boolean
+  showDocuments?: boolean
 }
-export default function SideBar({ slug, showRegistro, showCarServices, showLeads }: Props) {
+export default function SideBar({ slug, showRegistro, showCarServices, showLeads, showSellStuff, showDocuments }: Props) {
 
   const data= [
     {
@@ -21,11 +23,6 @@ export default function SideBar({ slug, showRegistro, showCarServices, showLeads
     },
     {
       href: "divider", icon: User
-    },
-    {
-      href: `/client/${slug}/documents`,
-      icon: BookOpen,
-      text: "Documentos"
     },
     {
       href: `/client/${slug}/chats`,
@@ -50,9 +47,6 @@ export default function SideBar({ slug, showRegistro, showCarServices, showLeads
       icon: Receipt,
       text: "Costos por uso"
     },
-    {
-      href: "divider", icon: User
-    },  
     {
       href: `/client/${slug}/users`,
       icon: User,
@@ -84,6 +78,22 @@ export default function SideBar({ slug, showRegistro, showCarServices, showLeads
             </Link>
           )
         })}
+        
+        <div className={cn("hidden", showDocuments && "block")}>
+          {divider()}
+
+          <Link href={`/client/${slug}/documents`} className={commonClasses}>
+            <div className="pb-1">
+              <BookOpen size={23} />
+            </div>
+            <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Documentos</p>                  
+          </Link>
+        </div>
+
+        <div className={cn("hidden", (showCarServices || showRegistro || slug === "summit") && "block")}>
+          {divider()}
+        </div>
+
         <Link href={`/client/${slug}/registro`} className={cn(commonClasses, path.endsWith("registro") && selectedClasses, !showRegistro && "hidden")}>
           <div className="pb-1">
             <Warehouse size={23} />
@@ -104,45 +114,49 @@ export default function SideBar({ slug, showRegistro, showCarServices, showLeads
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Servicios</p>                  
         </Link>
+        
+        <div className={cn("hidden", (showLeads || showSellStuff) && "block")}>
+          {divider()}
+        </div>
 
-        {divider()}
-
-        <Link href={`/client/${slug}/clientes`} className={cn(commonClasses, path.endsWith("clientes") && selectedClasses)}>
+        <Link href={`/client/${slug}/clientes`} className={cn(commonClasses, path.endsWith("clientes") && selectedClasses, (!showLeads && !showSellStuff) && "hidden")}>
           <div className="pb-1">
             <LucideBriefcase size={23} /> 
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Clientes</p>
         </Link>
 
-        <Link href={`/client/${slug}/productos`} className={cn(commonClasses, path.endsWith("productos") && selectedClasses)}>
+        <Link href={`/client/${slug}/productos`} className={cn(commonClasses, path.endsWith("productos") && selectedClasses, (!showSellStuff) && "hidden")}>
           <div className="pb-1">
             <Scan size={23} /> 
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Productos</p>                  
         </Link>
 
-        <Link href={`/client/${slug}/categorias`} className={cn(commonClasses, path.endsWith("categorias") && selectedClasses)}>
+        <Link href={`/client/${slug}/categorias`} className={cn(commonClasses, path.endsWith("categorias") && selectedClasses, (!showSellStuff) && "hidden")}>
           <div className="pb-1">
             <Tag size={23} /> 
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Categorias</p>
         </Link>
 
-        <Link href={`/client/${slug}/ventas`} className={cn(commonClasses, path.endsWith("ventas") && selectedClasses)}>
+        <Link href={`/client/${slug}/ventas`} className={cn(commonClasses, path.endsWith("ventas") && selectedClasses, (!showSellStuff) && "hidden")}>
           <div className="pb-1">
             <ShoppingBag size={23} />  
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Ventas</p>
         </Link>
 
-        <Link href={`/client/${slug}/vendedores`} className={cn(commonClasses, path.endsWith("vendedores") && selectedClasses)}>
+        <Link href={`/client/${slug}/vendedores`} className={cn(commonClasses, path.endsWith("vendedores") && selectedClasses, (!showSellStuff) && "hidden")}>
           <div className="pb-1">
           <Users size={23} />  
           </div>
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Vendedores</p>
         </Link>
 
-        {divider()}
+        <div className={cn("hidden", (showLeads) && "block")}>
+          {divider()}
+        </div>
 
         <Link href={`/client/${slug}/leads`} className={cn(commonClasses, path.endsWith("leads") && selectedClasses, !showLeads && "hidden")}>
           <div className="pb-1">
@@ -151,6 +165,7 @@ export default function SideBar({ slug, showRegistro, showCarServices, showLeads
           <p className={cn("hidden", !isChatPage && "md:block md:w-36")}>Leads</p>                  
         </Link>
 
+        {divider()}
 
       </section>
     </div>
