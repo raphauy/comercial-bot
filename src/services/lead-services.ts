@@ -83,8 +83,13 @@ export async function deleteLead(id: string) {
 }
 
 
-export async function getFullLeadsDAO() {
+export async function getFullLeadsDAO(clientId: string) {
   const found = await prisma.lead.findMany({
+    where: {
+      conversation: {
+        clientId
+      }
+    },
     orderBy: {
       id: 'asc'
     },

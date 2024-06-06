@@ -2,10 +2,19 @@ import { getFullLeadsDAO } from "@/services/lead-services"
 import { LeadDialog } from "./lead-dialogs"
 import { DataTable } from "./lead-table"
 import { columns } from "./lead-columns"
+import { getClientBySlug } from "@/services/clientService"
 
-export default async function LeadPage() {
+type Props = {
+  params: {
+    slug: string
+  }
+}
+export default async function LeadPage({ params }: Props) {
+  const slug= params.slug
+  const client= await getClientBySlug(slug)
+  if (!client) return <div>Client not found</div>
   
-  const data= await getFullLeadsDAO()
+  const data= await getFullLeadsDAO(client.id)
 
   return (
     <div className="w-full">      
