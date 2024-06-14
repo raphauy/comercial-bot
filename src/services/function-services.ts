@@ -152,51 +152,59 @@ export async function getContext(clientId: string, phone: string) {
 
   }
 
-  if (functionsNames.includes("insertLead") || functionsNames.includes("addItemToOrder")) {
-    const comClient= await getComClientDAOByPhone(clientId, phone)
-    contextString+= "\n**** Datos del usuario ****\n"
-    contextString+= `Phone: ${phone}\n`
-    if (!comClient) {
-      contextString+= "No se encontró ningún cliente con el número de teléfono: " + phone + ".\n"
-      contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
-    } else {
-      contextString+= `El usuario es un cliente (comClient), estos son sus datos:\n`
-      contextString+= `{
-        comClientId: "${comClient.id}",
-        nombre: ${comClient.name},
-        codigo: ${comClient.code},
-        departamento: ${comClient.departamento},
-        localidad: ${comClient.localidad},
-        direccion: ${comClient.direccion},
-        telefono: ${comClient.telefono}
-      }\n`
-      contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
-      const pendingOrders= await getTodayOrdersDAOByComClient(comClient.id)
-      if (pendingOrders.length > 0) {
-        contextString+= `El usuario tine los siguientes pedidos:\n`
-        pendingOrders.map((order) => {
+  const comClient= await getComClientDAOByPhone(clientId, phone)
+  contextString+= "\n**** Datos del usuario ****\n"
+  contextString+= `Phone: ${phone}\n`
+  if (!comClient) {
+    contextString+= "No se encontró ningún cliente con el número de teléfono: " + phone + ".\n"
+  } else {
+    contextString+= `El usuario es un cliente (comClient), estos son sus datos:\n`
+    contextString+= `{
+      comClientId: "${comClient.id}",
+      nombre: ${comClient.name},
+      codigo: ${comClient.code},
+      departamento: ${comClient.departamento},
+      localidad: ${comClient.localidad},
+      direccion: ${comClient.direccion},
+      telefono: ${comClient.telefono}
+    }\n`
+    contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
+    const pendingOrders= await getTodayOrdersDAOByComClient(comClient.id)
+    if (pendingOrders.length > 0) {
+      contextString+= `El usuario tine los siguientes pedidos:\n`
+      pendingOrders.map((order) => {
+        contextString+= `{
+          orderId: "${order.id}",
+          orderNumber: "#${completeWithZeros(order.orderNumber)}",
+          status: "${order.status}",
+          items:`
+        contextString+= "[\n"
+        order.orderItems.map((item) => {
           contextString+= `{
-            orderId: "${order.id}",
-            orderNumber: "#${completeWithZeros(order.orderNumber)}",
-            status: "${order.status}",
-            items:`
-          contextString+= "[\n"
-          order.orderItems.map((item) => {
-            contextString+= `{
-              codigo: "${item.code}",
-              nombre: "${item.name}",
-              precio: ${item.price},
-              cantidad: ${item.quantity}
-            },\n`
-          })
-          contextString+= "],\n"
-          contextString+= "},\n"
+            codigo: "${item.code}",
+            nombre: "${item.name}",
+            precio: ${item.price},
+            cantidad: ${item.quantity}
+          },\n`
         })
-        contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
-      }
+        contextString+= "],\n"
+        contextString+= "},\n"
+      })
     }
+  }
 
-    contextString+= "\n***************************\n"
+  contextString+= "\n***************************\n"
+
+  if (functionsNames.includes("insertLead")) {
+    if (!comClient) {
+      contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
+    }
+  }
+
+  if (functionsNames.includes("addItemToOrder")) {
+    if (comClient) {
+      contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
+    }
   }
 
 
