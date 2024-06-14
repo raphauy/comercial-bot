@@ -2,7 +2,7 @@ import { Client } from "@prisma/client";
 import { Groq } from "groq-sdk";
 import { ChatCompletion } from "groq-sdk/resources/chat/completions.mjs";
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
-import { CompletionInitResponse, notifyAgentes, notifyLead, processFunctionCall } from "./functions";
+import { CompletionInitResponse, notifyAgentes, notifyLead, notifyPedido, processFunctionCall } from "./functions";
 import { getFullModelDAO, getFullModelDAOByName } from "./model-services";
 
 export async function groqCompletionInit(client: Client, functions: ChatCompletionCreateParams.Function[], messages: ChatCompletion.Choice.Message[], modelName?: string): Promise<CompletionInitResponse | null> {
@@ -27,6 +27,7 @@ export async function groqCompletionInit(client: Client, functions: ChatCompleti
   let completionResponse= null
   let agentes= false
   let leads= false
+  let pedidos= false
 
   let baseArgs = {
     model: modelName,
@@ -86,6 +87,7 @@ export async function groqCompletionInit(client: Client, functions: ChatCompleti
       messages.push(responseMessage)
       agentes= notifyAgentes(name)
       leads= notifyLead(name)
+      pedidos= notifyPedido(name)
 
       const stepResponse = await groqCompletionInit(client, functions, messages, modelName)
       if (!stepResponse) return null
@@ -95,7 +97,8 @@ export async function groqCompletionInit(client: Client, functions: ChatCompleti
         promptTokens: stepResponse.promptTokens + promptTokens,
         completionTokens: stepResponse.completionTokens + completionTokens,
         agentes: stepResponse.agentes || agentes,
-        leads: stepResponse.leads || leads
+        leads: stepResponse.leads || leads,
+        pedidos: stepResponse.pedidos || pedidos
       }
 
     } else {
@@ -105,7 +108,7 @@ export async function groqCompletionInit(client: Client, functions: ChatCompleti
       } else {
         assistantResponse = initialResponse.choices[0].message.content
       }
-      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
+      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads, pedidos }
       return completionResponse
     }
   } catch (error: any) {
@@ -116,7 +119,7 @@ export async function groqCompletionInit(client: Client, functions: ChatCompleti
       console.log("429")
       assistantResponse+= " (L)"
     }
-    completionResponse= { assistantResponse, promptTokens: 0, completionTokens: 0, agentes, leads }
+    completionResponse= { assistantResponse, promptTokens: 0, completionTokens: 0, agentes, leads, pedidos }
     return completionResponse
   }
 }

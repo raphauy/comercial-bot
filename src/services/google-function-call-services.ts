@@ -1,7 +1,7 @@
 import { Client } from "@prisma/client"
 import { GoogleGenerativeAI, Content, FunctionDeclarationsTool, FunctionDeclaration } from "@google/generative-ai"
 import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/resources/index.mjs"
-import { CompletionInitResponse, notifyAgentes, notifyLead, processFunctionCall } from "./functions"
+import { CompletionInitResponse, notifyAgentes, notifyLead, notifyPedido, processFunctionCall } from "./functions"
 import { getFullModelDAO, getFullModelDAOByName } from "./model-services"
 
 export async function googleCompletionInit(client: Client, functions: ChatCompletionCreateParams.Function[], messages: ChatCompletionMessageParam[], systemMessage: string, modelName?: string): Promise<CompletionInitResponse | null> {
@@ -27,6 +27,7 @@ export async function googleCompletionInit(client: Client, functions: ChatComple
   let completionTokens= 0
   let agentes= false
   let leads= false
+  let pedidos= false
 
 
   // messages array have the input in the last message
@@ -109,6 +110,7 @@ export async function googleCompletionInit(client: Client, functions: ChatComple
       })
       agentes = notifyAgentes(name)
       leads = notifyLead(name)
+      pedidos= notifyPedido(name)
 
       const functionResponse = {
         functionResponse: {
@@ -133,21 +135,21 @@ export async function googleCompletionInit(client: Client, functions: ChatComple
 
       console.log("\tfunction call response!")      
       const assistantResponse = text
-      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
+      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads, pedidos }
       return completionResponse  
 
     } else {
     
       console.log("\tsimple response!")      
       const assistantResponse = text
-      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
+      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads, pedidos }
       return completionResponse  
     }
 
   } catch (error) {
       console.log(error)
       const assistantResponse = "Hubo un error al procesar el mensaje"
-      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
+      completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads, pedidos }
       return completionResponse  
     }
 
