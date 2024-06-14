@@ -167,6 +167,7 @@ export async function getFullSellsDAO(slug: string) {
 			vendor: true,
 		}
   })
+  // @ts-ignore
   const res: SellDAO[] = found.map((sell) => {
     return {
       ...sell,
