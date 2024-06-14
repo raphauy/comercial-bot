@@ -136,6 +136,8 @@ type OrderResponse = {
   orderId: string
   orderNumber: string
   status: string
+  note: string | null
+  date: string
   items: ItemResponse[]
 }
 
@@ -231,6 +233,8 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
     orderId: updatedOrder.id,
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
+    note: updatedOrder.note,
+    date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -316,6 +320,8 @@ export async function confirmOrderImpl(orderId: string, note?: string) {
     orderId: updated.id,
     orderNumber: "#"+completeWithZeros(updated.orderNumber),
     status: updated.status,
+    note: updated.note,
+    date: updated.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updated.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -363,6 +369,8 @@ export async function cancelOrderImpl(orderId: string, note?: string) {
     orderId: updated.id,
     orderNumber: "#"+completeWithZeros(updated.orderNumber),
     status: updated.status,
+    note: updated.note,
+    date: updated.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updated.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -414,6 +422,8 @@ export async function removeItemFromOrderImpl(orderId: string, productCode: stri
     orderId: updatedOrder.id,
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
+    note: updatedOrder.note,
+    date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -467,6 +477,8 @@ export async function changeQuantityOfItemInOrderImpl(orderId: string, productCo
     orderId: updatedOrder.id,
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
+    note: updatedOrder.note,
+    date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -569,6 +581,8 @@ export async function addBulkItemsToOrderImpl(clientId: string, orderId: string,
     orderId: updatedOrder.id,
     orderNumber: "#" + completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
+    note: updatedOrder.note,
+    date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
       code: item.code,
@@ -580,4 +594,50 @@ export async function addBulkItemsToOrderImpl(clientId: string, orderId: string,
   };
 
   return res;
+}
+
+export async function getOrderByPhone(clientId: string, phone: string) {
+  const order = await prisma.order.findFirst({
+    where: {
+      comClient: {
+        client: {
+          id: clientId
+        },
+        telefono: phone
+      },
+      status: OrderStatus.Confirmed,
+      updatedAt: {
+        gte: new Date(Date.now() - (24 * 60 * 60 * 1000)),
+      }
+    },
+    orderBy: {
+      updatedAt: 'desc'
+    },
+    include: {
+      orderItems: true,
+    }
+  })
+
+  if (!order) {
+    return null
+  }
+
+  const res: OrderResponse = {
+    orderId: order.id,
+    orderNumber: "#" + completeWithZeros(order.orderNumber),
+    status: order.status,
+    note: order.note,
+    date: order.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
+   items: order.orderItems.map((item) => ({
+      id: item.id,
+      code: item.code,
+      name: item.name as string,
+      quantity: item.quantity,
+      price: item.price as number,
+      currency: item.currency as string,
+    })),
+  }
+
+  return res
+
 }

@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         const name= json.name
         const stock= json.stock
         const pedidoEnOrigen= json.pedidoEnOrigen
-        const precioUSD= json.precioUSD
+        const precioUSD= json.precio
         const categoryName= json.categoryName
 
         const dataProduct = {

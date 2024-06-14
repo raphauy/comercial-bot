@@ -8,7 +8,7 @@ interface Props {
     basePath: string
 }
 
-export default function LeadHook({ basePath }: Props) {
+export default function LeadYPedidoHook({ basePath }: Props) {
 
     const [clientId, setClientId]= useState("") 
 
@@ -23,8 +23,9 @@ export default function LeadHook({ basePath }: Props) {
 
     return (
         <div className="w-full p-4 mt-2 border rounded-lg">
-            <p className="text-2xl font-bold">Lead Hook</p>
+            <p className="text-2xl font-bold">Leads y Pedidos</p>
             <SimpleCopyHook name="getLead" path={`${basePath}/api/${clientId}/leads`} />
+            <SimpleCopyHook name="getPedido" path={`${basePath}/api/${clientId}/pedidos`} />
         </div>
     )
 }

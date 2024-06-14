@@ -11,7 +11,7 @@ import CopyHook from "./copy-hook"
 import { getClientBySlug, getFunctionsOfClient } from "@/services/clientService"
 import DocumentsHook from "./documents-hook"
 import ComercialHook from "./comercial-hook"
-import LeadHook from "./leads-hook"
+import LeadYPedidoHook from "./leads-hook"
 
 type Props = {
     searchParams: {
@@ -31,6 +31,7 @@ export default async function ConfigPage({ searchParams }: Props) {
     const functionsOfClient= await getFunctionsOfClient(clientId)
     const haveCarServiceFunction= functionsOfClient.find((f) => f.name === "reservarServicio") !== undefined
     const haveInsertLeadFunction= functionsOfClient.find((f) => f.name === "insertLead") !== undefined
+    const havePedidoFunction= functionsOfClient.find((f) => f.name === "addItemToOrder") !== undefined
 
     const BASE_PATH= process.env.NEXTAUTH_URL || "NOT-CONFIGURED"
 
@@ -67,11 +68,11 @@ export default async function ConfigPage({ searchParams }: Props) {
                         <CopyHook name="Car Service Entry" path={`${BASE_PATH}/api/${client.id}/car-service`} clientId={client.id} />
                     }
                     {
-                        haveInsertLeadFunction && 
-                        <LeadHook basePath={BASE_PATH} />
+                        (haveInsertLeadFunction || havePedidoFunction) && 
+                        <LeadYPedidoHook basePath={BASE_PATH} />
                         
                     }
-                </TabsContent>
+                    </TabsContent>
                 <TabsContent value="general">
                     <ConfigsPage />
                 </TabsContent>

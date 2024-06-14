@@ -2,7 +2,7 @@ import axios from 'axios';
 import https from 'https';
 import { getClient } from './clientService';
 
-export async function sendWapMessage(phone: string, body: string, notificarAgente: boolean, notificarLead: boolean, clientId: string): Promise<void> {
+export async function sendWapMessage(phone: string, body: string, notificarAgente: boolean, notificarLead: boolean, notificarPedido: boolean, clientId: string): Promise<void> {
 
   if (notificarAgente)
     console.log("Notificando agente a Osom")
@@ -28,6 +28,7 @@ export async function sendWapMessage(phone: string, body: string, notificarAgent
 
   const agente= notificarAgente ? 1 : 0
   const lead= notificarLead ? 1 : 0
+  const pedido= notificarPedido ? 1 : 0
 
   const headers = {
     'Content-Type': 'application/json',
@@ -36,7 +37,8 @@ export async function sendWapMessage(phone: string, body: string, notificarAgent
     phone,
     body: text,
     agente,
-    lead
+    lead,
+    pedido
   } 
 
   const attempts= 3

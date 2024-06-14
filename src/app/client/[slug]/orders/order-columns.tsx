@@ -82,7 +82,8 @@ export const columns: ColumnDef<OrderDAO>[] = [
             <OrderDialog id={data.id} />
             <DeleteOrderDialog description={deleteDescription} id={data.id} />
           </div>
-          <p>{format(data.updatedAt, "yyyy-MM-dd HH:mm", { locale: es})}</p>
+          <p>{format(data.updatedAt, "yyyy-MM-dd", { locale: es})}</p>
+          <p className="mr-1 text-end">{format(data.updatedAt, "HH:mm", { locale: es})}</p>
         </div>
 
       )

@@ -46,7 +46,7 @@ export default async function SlugLayout({ children, params }: Props) {
   const clinetsOfLeads= await getClientsOfFunctionByName("insertLead")
   const showLeads= clinetsOfLeads.map(c => c.slug).includes(slug)
 
-  const clientsOfSellStuff= await getClientsOfFunctionByName("getTopBuyers")
+  const clientsOfSellStuff= await getClientsOfFunctionByName("getClientByCode")
   const showSellStuff= clientsOfSellStuff.map(c => c.slug).includes(slug)
 
   const clientsOfDocumens= await getClientsOfFunctionByName("getDocument")

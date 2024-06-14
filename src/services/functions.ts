@@ -19,6 +19,7 @@ export type CompletionInitResponse = {
   completionTokens: number
   agentes: boolean  
   leads: boolean
+  pedidos: boolean
 }
 
 export type DocumentResult = {
@@ -709,6 +710,18 @@ export function notifyLead(name: string): boolean {
   let res= false
   switch (name) {
     case "insertLead":
+      res= true
+      break
+    default:
+      break
+  }
+  return res
+}
+
+export function notifyPedido(name: string): boolean {
+  let res= false
+  switch (name) {
+    case "confirmOrder":
       res= true
       break
     default:

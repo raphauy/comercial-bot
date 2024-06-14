@@ -1,7 +1,7 @@
 import { Client } from "@prisma/client";
 import OpenAI from "openai";
 import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import { CompletionInitResponse, notifyAgentes, notifyLead, processFunctionCall } from "./functions";
+import { CompletionInitResponse, notifyAgentes, notifyLead, notifyPedido, processFunctionCall } from "./functions";
 import { getFullModelDAO } from "./model-services";
 
 const MAX_RECURSIONS = 10;
@@ -27,6 +27,7 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
   let completionResponse= null
   let agentes= false
   let leads= false
+  let pedidos= false
 
   let baseArgs = {
     model: modelName,
@@ -68,6 +69,7 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
     })
     agentes= notifyAgentes(name)
     leads= notifyLead(name)
+    pedidos= notifyPedido(name)
 
     const stepResponse = await completionInit(client, functions, messages, recursionCount + 1, modelName)
     if (!stepResponse) return null
@@ -77,14 +79,15 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
       promptTokens: stepResponse.promptTokens + promptTokens,
       completionTokens: stepResponse.completionTokens + completionTokens,
       agentes: stepResponse.agentes || agentes,
-      leads: stepResponse.leads || leads
+      leads: stepResponse.leads || leads,
+      pedidos: stepResponse.pedidos || pedidos
     }
 
   } else {
     console.log("\tsimple response!")
     console.log("\t", initialResponse.choices[0].message.content)
     assistantResponse = initialResponse.choices[0].message.content
-    completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
+    completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads, pedidos }
     return completionResponse
   }
 }
