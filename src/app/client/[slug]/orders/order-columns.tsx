@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button"
 import { OrderDAO } from "@/services/order-services"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowBigRight, ArrowUpDown, Check } from "lucide-react"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import { DeleteOrderDialog, OrderDialog } from "./order-dialogs"
 import { completeWithZeros } from "@/lib/utils"
+import { es } from "date-fns/locale"
 
 
 export const columns: ColumnDef<OrderDAO>[] = [
@@ -76,10 +77,12 @@ export const columns: ColumnDef<OrderDAO>[] = [
       const deleteDescription= `Do you want to delete Order ${data.id}?`
  
       return (
-        <div className="flex items-center justify-end gap-2">
-
-          <OrderDialog id={data.id} />
-          <DeleteOrderDialog description={deleteDescription} id={data.id} />
+        <div>
+          <div className="flex items-center justify-end gap-2">
+            <OrderDialog id={data.id} />
+            <DeleteOrderDialog description={deleteDescription} id={data.id} />
+          </div>
+          <p>{format(data.updatedAt, "yyyy-MM-dd HH:mm", { locale: es})}</p>
         </div>
 
       )

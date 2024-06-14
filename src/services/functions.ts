@@ -11,7 +11,7 @@ import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl, getTopBuyersImpl, getTopBuyersByDepartamentoImpl, getTopBuyersByDepartamentoAndVendorImpl } from "./comclient-services";
 import { LeadFormValues, createLead } from "./lead-services";
-import { addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, removeItemFromOrderImpl } from "./order-services";
+import { addBulkItemsToOrderImpl, addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, removeItemFromOrderImpl } from "./order-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -530,6 +530,35 @@ export async function changeQuantityOfItemInOrder(clientId: string, orderId: str
   }
 }
 
+export type FunctionCallProduct = {
+  productCode: string
+  quantity: string
+}
+export async function addBulkItemsToOrder(clientId: string, orderId: string, comClientId: string, products: FunctionCallProduct[]) {
+  console.log("addBulkItemsToOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tcomClientId: ${comClientId}`)
+  console.log(`\tproducts: ${products}`)
+
+  if (!orderId || !comClientId || !products) {
+    return "Parámetros incorrectos, orderId, comClientId y products son obligatorios"
+  }
+
+  try {
+    const order= await addBulkItemsToOrderImpl(clientId, orderId, comClientId, products)
+    if (!order) return "Error al agregar los productos a la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)      
+  } catch (error) {
+    console.log("Error al agregar los productos a la orden")
+    console.log(error)
+    return "Error al agregar los productos a la orden"
+  }
+}
+
 
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
@@ -647,6 +676,10 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "changeQuantityOfItemInOrder":
       content= await changeQuantityOfItemInOrder(clientId, args.orderId, args.productCode, args.quantity)
+      break
+
+    case "addBulkItemsToOrder":
+      content= await addBulkItemsToOrder(clientId, args.orderId, args.comClientId, args.products)
       break
   
     default:

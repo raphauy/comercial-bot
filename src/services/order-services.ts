@@ -2,8 +2,8 @@ import * as z from "zod"
 import { prisma } from "@/lib/db"
 import { ComClientDAO, getComClientDAO } from "./comclient-services"
 import { OrderStatus, PaymentMethod } from "@prisma/client"
-import { OrderItemDAO, OrderItemFormValues } from "./orderitem-services"
-import { getProductByCode } from "./functions"
+import { OrderItemDAO, OrderItemFormValues, createOrderItem, updateOrderItem } from "./orderitem-services"
+import { FunctionCallProduct, getProductByCode } from "./functions"
 import { getFullProductDAOByCode } from "./product-services"
 import { completeWithZeros } from "@/lib/utils"
 
@@ -87,10 +87,17 @@ export async function deleteOrder(id: string) {
 }
 
 
-export async function getFullOrdersDAO() {
+export async function getFullOrdersDAO(slug: string) {
   const found = await prisma.order.findMany({
+    where: {
+      comClient: {
+        client: {
+          slug
+        }
+      }
+    },
     orderBy: {
-      id: 'asc'
+      updatedAt: 'desc'
     },
     include: {
 			comClient: true,
@@ -150,11 +157,10 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
     throw new Error(`ComClient no encontrado: ${comClientId}`)
   }
 
-  const orderNumber = await getLastOrderNumber(clientId) + 1
-
   let order
   if (orderId === "new") {
     // Crear nueva orden
+    const orderNumber = await getLastOrderNumber(clientId) + 1
     order = await prisma.order.create({
       data: {
         orderNumber,
@@ -178,25 +184,43 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
     }
   }
 
-  // Actualizar orden con el nuevo item
-  const updatedOrder = await prisma.order.update({
+  const productDAO = await getFullProductDAOByCode(clientId, productCode);
+  if (!productDAO) {
+    throw new Error(`Producto no encontrado: ${productCode}`);
+  }
+
+  const data = {
+    orderId: order.id,
+    productId: productDAO.id,
+    code: productDAO.code,
+    name: productDAO.name,
+    quantity: Number(quantity),
+    price: productDAO.precioUSD,
+  };
+
+  const orderItem = await prisma.orderItem.findFirst({
+    where: {
+      orderId: order.id,
+      code: productDAO.code,
+    },
+  });
+
+  if (!orderItem) {
+    await createOrderItem(data);
+  } else {
+    await updateOrderItem(orderItem.id, {
+      ...data,
+      quantity: orderItem.quantity + data.quantity,
+    })
+  }
+
+  const updatedOrder = await prisma.order.findUnique({
     where: {
       id: order.id
     },
-    data: {
-      orderItems: {
-        create: {
-          productId: product.id,
-          code: product.code,
-          name: product.name,
-          quantity: quantity,
-          price: product.precioUSD,
-        }
-      }
-    },
     include: {
       orderItems: true,
-    },
+    }
   })
 
   if (!updatedOrder) {
@@ -454,4 +478,106 @@ export async function changeQuantityOfItemInOrderImpl(orderId: string, productCo
   } 
 
   return res
+}
+
+export async function addBulkItemsToOrderImpl(clientId: string, orderId: string, comClientId: string, products: FunctionCallProduct[]) {
+  console.log("addBulkItemsToOrderImpl");
+
+  if (!clientId || !orderId || !comClientId || !products || products.length === 0) {
+    throw new Error("Parámetros incorrectos, clientId, orderId, comClientId y products son obligatorios y products no puede estar vacío");
+  }
+
+  const comClient = await getComClientDAO(comClientId);
+  if (!comClient) {
+    throw new Error(`ComClient no encontrado: ${comClientId}`);
+  }
+
+  let order;
+  if (orderId === "new") {
+    // Crear nueva orden
+    const orderNumber = await getLastOrderNumber(clientId) + 1;
+    order = await prisma.order.create({
+      data: {
+        orderNumber,
+        comClientId: comClientId,
+        phone: comClient.telefono as string,
+        status: OrderStatus.Ordering,
+      }
+    });
+    if (!order) {
+      throw new Error("Error al crear la orden");
+    }
+  } else {
+    // Buscar orden existente
+    order = await prisma.order.findUnique({
+      where: {
+        id: orderId
+      },
+    });
+    if (!order) {
+      throw new Error(`No se encontró una orden con id ${orderId}`);
+    }
+  }
+
+  // Iterar sobre los productos y crear o actualizar items de la orden
+  for (const product of products) {
+    const productDAO = await getFullProductDAOByCode(clientId, product.productCode);
+    if (!productDAO) {
+      throw new Error(`Producto no encontrado: ${product.productCode}`);
+    }
+
+    const data = {
+      orderId: order.id,
+      productId: productDAO.id,
+      code: productDAO.code,
+      name: productDAO.name,
+      quantity: Number(product.quantity),
+      price: productDAO.precioUSD,
+    };
+
+    const orderItem = await prisma.orderItem.findFirst({
+      where: {
+        orderId: order.id,
+        code: productDAO.code,
+      },
+    });
+
+    if (!orderItem) {
+      await createOrderItem(data);
+    } else {
+      await updateOrderItem(orderItem.id, {
+        ...data,
+        quantity: orderItem.quantity + data.quantity,
+      });
+    }
+  }
+
+  const updatedOrder = await prisma.order.findUnique({
+    where: {
+      id: order.id
+    },
+    include: {
+      orderItems: true,
+    }
+  });
+
+  if (!updatedOrder) {
+    throw new Error("Error al actualizar la orden");
+  }
+
+  const res: OrderResponse = {
+    orderId: updatedOrder.id,
+    orderNumber: "#" + completeWithZeros(updatedOrder.orderNumber),
+    status: updatedOrder.status,
+    items: updatedOrder.orderItems.map((item) => ({
+      id: item.id,
+      code: item.code,
+      name: item.name as string,
+      quantity: item.quantity,
+      price: item.price as number,
+      currency: item.currency as string,
+    })),
+  };
+
+  return res;
 }

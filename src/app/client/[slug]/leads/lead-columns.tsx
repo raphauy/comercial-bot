@@ -92,7 +92,7 @@ export const columns: ColumnDef<LeadDAO>[] = [
     )},
 		cell: ({ row }) => {
       const data= row.original
-      return (<p>{formatDistanceToNow(data.updatedAt, {locale: es})}</p>) 
+      return (<p>{format(data.updatedAt, "yyyy-MM-dd HH:mm", { locale: es})}</p>)
     }
   },
   

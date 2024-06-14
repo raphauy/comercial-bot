@@ -396,3 +396,41 @@ const cancelOrder=
         "required": ["orderId"]
     }
 }
+
+const addBulkItemsToOrder = 
+{
+    "name": "addBulkItemsToOrder",
+    "description": "Añade múltiples productos a un pedido y devuelve el pedido actualizado. Esta función es exclusiva para clientes existentes en el sistema.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido. Si se quiere crear un nuevo pedido, se debe utilizar el valor 'new'"
+            },
+            "comClientId": {
+                "type": "string",
+                "description": "Identificador del comClient que estará disponible en el prompt"
+            },
+            "products": {
+                "type": "array",
+                "description": "Array de productos para añadir al pedido",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "productCode": {
+                            "type": "string",
+                            "description": "Código del producto"
+                        },
+                        "quantity": {
+                            "type": "string",
+                            "description": "Cantidad del producto para esta orden"
+                        }
+                    },
+                    "required": ["productCode", "quantity"]
+                }
+            }
+        },
+        "required": ["orderId", "comClientId", "products"]
+    }
+}

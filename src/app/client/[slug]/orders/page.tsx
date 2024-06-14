@@ -3,9 +3,14 @@ import { OrderDialog } from "./order-dialogs"
 import { DataTable } from "./order-table"
 import { columns } from "./order-columns"
 
-export default async function OrderPage() {
+type Props = {
+  params: {
+    slug: string
+  }
+}
+export default async function OrderPage({ params }: Props) {
   
-  const data= await getFullOrdersDAO()
+  const data= await getFullOrdersDAO(params.slug)
 
   return (
     <div className="w-full">      

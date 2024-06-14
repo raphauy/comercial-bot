@@ -167,7 +167,7 @@ export async function getFullSellsDAO(slug: string) {
 			vendor: true,
 		}
   })
-  // @ts-ignore
+
   const res: SellDAO[] = found.map((sell) => {
     return {
       ...sell,
@@ -177,6 +177,8 @@ export async function getFullSellsDAO(slug: string) {
       },
       comClient: {
         ...sell.comClient,
+        razonSocial: sell.comClient.razonSocial || "",
+        rutOrCI: sell.comClient.rutOrCI || "",
         departamento: sell.comClient.departamento || "",
         localidad: sell.comClient.localidad || "",
         direccion: sell.comClient.direccion || "",
