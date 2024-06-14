@@ -202,7 +202,7 @@ export async function getContext(clientId: string, phone: string) {
   }
 
   if (functionsNames.includes("addItemToOrder")) {
-    contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
+    // contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
   }
 
 

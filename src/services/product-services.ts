@@ -385,7 +385,8 @@ export type SimilarityProductResult = {
 	nombre: string
 	stock: number
 	pedidoEnOrigen: number
-	precioUSD: number
+	precio: number
+  moneda: string
   familia: string
   vectorDistance: number
 }
@@ -404,7 +405,7 @@ export async function productSimilaritySearch(clientId: string, text: string, li
 
 
   const similarityResult: any[] = await prisma.$queryRaw`
-    SELECT p."externalId", p."code", p."name", p."stock", p."pedidoEnOrigen", p."precioUSD", c."name" AS "categoryName", p."embedding" <-> ${textEmbedding}::vector AS distance
+    SELECT p."externalId", p."code", p."name", p."stock", p."pedidoEnOrigen", p."precioUSD", p."currency", c."name" AS "categoryName", p."embedding" <-> ${textEmbedding}::vector AS distance
     FROM "Product" AS p
     INNER JOIN "Category" AS c ON p."categoryId" = c."id" 
     WHERE p."clientId" = ${clientId} AND p."embedding" <-> ${textEmbedding}::vector < 1.3
@@ -421,7 +422,8 @@ export async function productSimilaritySearch(clientId: string, text: string, li
         nombre: row.name,
         stock: row.stock,
         pedidoEnOrigen: row.pedidoEnOrigen,
-        precioUSD: row.precioUSD,
+        precio: row.precioUSD,
+        moneda: row.currency,
         familia: row.categoryName,
         vectorDistance: row.distance
       })
