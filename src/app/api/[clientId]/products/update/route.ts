@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { createOrUpdateProduct } from "@/services/product-services";
+import { ProductFormValues, createOrUpdateProduct } from "@/services/product-services";
 
 
 export async function POST(request: Request, { params }: { params: { clientId: string } }) {
@@ -25,17 +25,19 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         const name= json.name
         const stock= json.stock
         const pedidoEnOrigen= json.pedidoEnOrigen
-        const precioUSD= json.precio
+        const precio= json.precio
+        const currency= json.currency || "UYU"
         const categoryName= json.categoryName
 
-        const dataProduct = {
+        const dataProduct: ProductFormValues = {
             clientId,
             externalId,
             code,
             name,
-            stock,
-            pedidoEnOrigen,
-            precioUSD,
+            stock: Number(stock),              
+            pedidoEnOrigen: Number(pedidoEnOrigen),
+            precioUSD: Number(precio),
+            currency,
             categoryName,
         };
         console.log(dataProduct)

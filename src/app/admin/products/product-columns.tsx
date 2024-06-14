@@ -105,7 +105,7 @@ export const columns: ColumnDef<ProductDAO>[] = [
     cell: ({ row }) => {
       const data= row.original
       return (
-        <p className="mr-5 text-right">{formatCurrency(data.precioUSD)}</p>
+        <p className="mr-5 text-right whitespace-nowrap">{data.precioUSD} {data.currency}</p>
       )
     },
   },

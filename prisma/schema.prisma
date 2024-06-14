@@ -342,6 +342,7 @@ model Product {
   stock           Int                               // gennext: show.column
   pedidoEnOrigen  Int                               // gennext: show.column
   precioUSD       Float                             // gennext: show.column
+  currency        String    @default("UYU")         // gennext: show.column
 
   category        Category  @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   categoryId      String

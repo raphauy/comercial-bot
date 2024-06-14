@@ -14,6 +14,7 @@ export type ProductDAO = {
 	stock: number
 	pedidoEnOrigen: number
 	precioUSD: number
+  currency: string
 	category: CategoryDAO
 	categoryId: string
   categoryName: string
@@ -29,6 +30,7 @@ export const productSchema = z.object({
 	stock: z.number({required_error: "stock is required."}),
 	pedidoEnOrigen: z.number({required_error: "pedidoEnOrigen is required."}),
 	precioUSD: z.number({required_error: "precioUSD is required."}),
+  currency: z.string().min(1, "currency is required."),
 	categoryName: z.string().min(1, "categoryId is required."),
   clientId: z.string().min(1, "clientSlug is required."),
 })
