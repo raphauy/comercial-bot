@@ -23,9 +23,10 @@ export default function ComercialHook({ basePath }: Props) {
 
     return (
         <div className="w-full p-4 mt-2 border rounded-lg">
-            <p className="text-2xl font-bold">Ventas Hooks</p>
+            <p className="text-2xl font-bold">Productos, Clientes y Ventass</p>
             <SimpleCopyHook name="update products" path={`${basePath}/api/${clientId}/products/update`} />
             <SimpleCopyHook name="update sells" path={`${basePath}/api/${clientId}/sells/update`} />
+            <SimpleCopyHook name="update comClients" path={`${basePath}/api/${clientId}/comclients/update`} />
         </div>
     )
 }

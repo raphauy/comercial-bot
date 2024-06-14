@@ -8,6 +8,8 @@ import { es } from "date-fns/locale"
 import { getActiveConversation } from "./conversationService"
 import { getFunctionsOfClient } from "./clientService"
 import { getComClientDAOByPhone } from "./comclient-services"
+import { getTodayOrdersDAOByComClient } from "./order-services"
+import { completeWithZeros } from "@/lib/utils"
 
 export type FunctionDAO = {
 	id: string
@@ -150,7 +152,7 @@ export async function getContext(clientId: string, phone: string) {
 
   }
 
-  if (functionsNames.includes("insertLead")) {
+  if (functionsNames.includes("insertLead") || functionsNames.includes("addItemToOrder")) {
     const comClient= await getComClientDAOByPhone(clientId, phone)
     contextString+= "\n**** Datos del usuario ****\n"
     contextString+= `Phone: ${phone}\n`
@@ -158,8 +160,9 @@ export async function getContext(clientId: string, phone: string) {
       contextString+= "No se encontró ningún cliente con el número de teléfono: " + phone + ".\n"
       contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
     } else {
-      contextString+= `El usuario es un cliente, estos son sus datos:\n`
+      contextString+= `El usuario es un cliente (comClient), estos son sus datos:\n`
       contextString+= `{
+        comClientId: "${comClient.id}",
         nombre: ${comClient.name},
         codigo: ${comClient.code},
         departamento: ${comClient.departamento},
@@ -168,6 +171,29 @@ export async function getContext(clientId: string, phone: string) {
         telefono: ${comClient.telefono}
       }\n`
       contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
+      const pendingOrders= await getTodayOrdersDAOByComClient(comClient.id)
+      if (pendingOrders.length > 0) {
+        contextString+= `El usuario tine los siguientes pedidos:\n`
+        pendingOrders.map((order) => {
+          contextString+= `{
+            orderId: "${order.id}",
+            orderNumber: "#${completeWithZeros(order.orderNumber)}",
+            status: "${order.status}",
+            items:`
+          contextString+= "[\n"
+          order.orderItems.map((item) => {
+            contextString+= `{
+              codigo: "${item.code}",
+              nombre: "${item.name}",
+              precio: ${item.price},
+              cantidad: ${item.quantity}
+            },\n`
+          })
+          contextString+= "],\n"
+          contextString+= "},\n"
+        })
+        contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
+      }
     }
 
     contextString+= "\n***************************\n"

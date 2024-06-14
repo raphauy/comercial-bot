@@ -4,8 +4,13 @@ import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/r
 import { CompletionInitResponse, notifyAgentes, notifyLead, processFunctionCall } from "./functions";
 import { getFullModelDAO } from "./model-services";
 
+const MAX_RECURSIONS = 10;
 
-export async function completionInit(client: Client, functions: ChatCompletionCreateParams.Function[], messages: ChatCompletionMessageParam[], modelName?: string): Promise<CompletionInitResponse | null> {
+export async function completionInit(client: Client, functions: ChatCompletionCreateParams.Function[], messages: ChatCompletionMessageParam[], recursionCount: number = 0, modelName?: string): Promise<CompletionInitResponse | null> {
+
+  if (recursionCount > MAX_RECURSIONS) {
+    throw new Error("Max recursion limit reached");
+  }
 
   if (!client.modelId) throw new Error("Client modelId not found")
 
@@ -64,7 +69,7 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
     agentes= notifyAgentes(name)
     leads= notifyLead(name)
 
-    const stepResponse = await completionInit(client, functions, messages, modelName)
+    const stepResponse = await completionInit(client, functions, messages, recursionCount + 1, modelName)
     if (!stepResponse) return null
 
     return {
@@ -76,7 +81,8 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
     }
 
   } else {
-    console.log("\tsimple response!")      
+    console.log("\tsimple response!")
+    console.log("\t", initialResponse.choices[0].message.content)
     assistantResponse = initialResponse.choices[0].message.content
     completionResponse= { assistantResponse, promptTokens, completionTokens, agentes, leads }
     return completionResponse

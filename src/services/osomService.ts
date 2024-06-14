@@ -3,8 +3,6 @@ import https from 'https';
 import { getClient } from './clientService';
 
 export async function sendWapMessage(phone: string, body: string, notificarAgente: boolean, notificarLead: boolean, clientId: string): Promise<void> {
-  const agente= notificarAgente ? 1 : 0
-  const lead= notificarLead ? 1 : 0
 
   if (notificarAgente)
     console.log("Notificando agente a Osom")
@@ -27,6 +25,9 @@ export async function sendWapMessage(phone: string, body: string, notificarAgent
   let text= quitarUrlEntreParentesisRectos(body)
   text= quitarCorchetes(text)
   text= quitarParentesis(text)
+
+  const agente= notificarAgente ? 1 : 0
+  const lead= notificarLead ? 1 : 0
 
   const headers = {
     'Content-Type': 'application/json',

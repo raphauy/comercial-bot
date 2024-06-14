@@ -232,7 +232,7 @@ export async function processMessage(id: string, modelName?: string) {
   const providerName= model.providerName
 
   if (providerName === "OpenAI") {
-    completionResponse= await completionInit(client,functions, messages, modelName)
+    completionResponse= await completionInit(client,functions, messages, 0, modelName)
   } else if (providerName === "Google") {
     completionResponse= await googleCompletionInit(client,functions, messages, systemMessage.content, modelName)
   } else if (providerName === "Groq") {

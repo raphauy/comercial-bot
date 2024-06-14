@@ -11,6 +11,7 @@ import { revalidatePath } from "next/cache";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl, getTopBuyersImpl, getTopBuyersByDepartamentoImpl, getTopBuyersByDepartamentoAndVendorImpl } from "./comclient-services";
 import { LeadFormValues, createLead } from "./lead-services";
+import { addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, removeItemFromOrderImpl } from "./order-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -400,6 +401,135 @@ export async function insertLead(clientId: string, conversationId: string, name:
   return "Lead insertado correctamente"
 }
 
+export async function addItemToOrder(clientId: string, orderId: string, comClientId: string, productCode: string, quantity: string) {
+  console.log("addItemToOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tcomClientId: ${comClientId}`)
+  console.log(`\tproductCode: ${productCode}`)
+  console.log(`\tquantity: ${quantity}`)
+
+  if (!orderId || !comClientId || !productCode || !quantity) {
+    return "Parámetros incorrectos, orderId, comClientId, productCode y quantity son obligatorios"
+  }
+
+  try {
+    const order= await addItemToOrderImpl(clientId, orderId, comClientId, productCode, Number(quantity))
+    if (!order) return "Error al agregar el producto a la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)
+      
+  } catch (error) {
+    console.log("Error al agregar el producto a la orden")
+    console.log(error)
+    return "Error al agregar el producto a la orden"
+    
+  }
+}
+
+export async function confirmOrder(clientId: string, orderId: string, note: string) {
+  console.log("confirmOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tnote: ${note}`)
+
+  if (!orderId) {
+    return "Parámetros incorrectos, orderId y note son obligatorios"
+  }
+
+  try {
+    const order= await confirmOrderImpl(orderId, note)
+    if (!order) return "Error al confirmar la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)
+      
+  } catch (error) {
+    console.log("Error al confirmar la orden")
+    console.log(error)
+    return "Error al confirmar la orden"    
+  }
+}
+
+export async function cancelOrder(clientId: string, orderId: string, note: string) {
+  console.log("cancelOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tnote: ${note}`)
+
+  if (!orderId || !note) {
+    return "Parámetros incorrectos, orderId y note son obligatorios"
+  }
+
+  try {
+    const order= await cancelOrderImpl(orderId, note)
+    if (!order) return "Error al cancelar la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)
+      
+  } catch (error) {
+    console.log("Error al cancelar la orden")
+    console.log(error)
+    return "Error al cancelar la orden"    
+  }
+}
+
+export async function removeItemFromOrder(clientId: string, orderId: string, productCode: string) {
+  console.log("removeItemFromOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tproductCode: ${productCode}`)
+
+  if (!orderId || !productCode) {
+    return "Parámetros incorrectos, orderId y productCode son obligatorios"
+  }
+
+  try {
+    const order= await removeItemFromOrderImpl(orderId, productCode)
+    if (!order) return "Error al eliminar el item de la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)
+      
+  } catch (error) {
+    console.log("Error al eliminar el item de la orden")
+    console.log(error)
+    return "Error al eliminar el item de la orden"    
+  }
+}
+
+export async function changeQuantityOfItemInOrder(clientId: string, orderId: string, productCode: string, quantity: string) {
+  console.log("changeQuantityOfItemInOrder")
+  console.log(`\torderId: ${orderId}`)
+  console.log(`\tproductCode: ${productCode}`)
+  console.log(`\tquantity: ${quantity}`)
+
+  if (!orderId || !productCode || !Number(quantity)) {
+    return "Parámetros incorrectos, orderId, productCode y quantity son obligatorios"
+  }
+
+  try {
+    const order= await changeQuantityOfItemInOrderImpl(orderId, productCode, Number(quantity))
+    if (!order) return "Error al cambiar la cantidad del item de la orden"
+  
+    console.log("orden actualizada")
+    console.log(JSON.stringify(order))  
+  
+    return JSON.stringify(order)
+      
+  } catch (error) {
+    console.log("Error al cambiar la cantidad del item de la orden")
+    console.log(error)
+    return "Error al cambiar la cantidad del item de la orden"    
+  }
+}
+
 
 export async function processFunctionCall(clientId: string, name: string, args: any) {
   console.log("function_call: ", name, args)
@@ -497,6 +627,26 @@ export async function processFunctionCall(clientId: string, name: string, args: 
 
     case "insertLead":
       content= await insertLead(clientId, args.conversationId, args.name, args.companyName, args.rutOrCI, args.phone, args.address)
+      break
+
+    case "addItemToOrder":
+      content= await addItemToOrder(clientId, args.orderId, args.comClientId, args.productCode, args.quantity)
+      break
+
+    case "confirmOrder":
+      content= await confirmOrder(clientId, args.orderId, args.note)
+      break
+
+    case "cancelOrder":
+      content= await cancelOrder(clientId, args.orderId, args.note)
+      break
+
+    case "removeItemFromOrder":
+      content= await removeItemFromOrder(clientId, args.orderId, args.productCode)
+      break
+
+    case "changeQuantityOfItemInOrder":
+      content= await changeQuantityOfItemInOrder(clientId, args.orderId, args.productCode, args.quantity)
       break
   
     default:

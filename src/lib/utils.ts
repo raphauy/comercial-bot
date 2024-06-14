@@ -133,3 +133,7 @@ export function decodeAndCorrectText(str: string): string {
 
   return decodedStr;
 }
+
+export function completeWithZeros(number: number): string {
+  return number.toString().padStart(4, "0")
+}

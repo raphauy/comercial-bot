@@ -68,7 +68,7 @@
     "node-postgres": "^0.6.2",
     "nodemailer": "^6.9.4",
     "novel": "^0.1.22",
-    "openai": "4.28.0",
+    "openai": "^4.51.0",
     "openai-edge": "^1.2.2",
     "openai-gpt-token-counter": "^1.1.0",
     "pgvector": "^0.1.5",

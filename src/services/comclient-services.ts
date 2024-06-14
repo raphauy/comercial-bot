@@ -3,15 +3,18 @@ import { prisma } from "@/lib/db"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
 import { getFullVendorDAO, getFullVendorDAOByName, vendorSimilaritySearch } from "./vendor-services";
+import { getClient } from "./clientService";
 
 export type ComClientDAO = {
 	id: string
 	code: string
 	name: string
+  razonSocial: string | undefined
 	departamento: string | undefined
 	localidad: string | undefined
 	direccion: string | undefined
 	telefono: string | undefined
+  rutOrCI: string | undefined
 	clientId: string
   createdAt: Date
   updatedAt: Date
@@ -20,10 +23,12 @@ export type ComClientDAO = {
 export const comClientSchema = z.object({
 	code: z.string().min(1, "code is required."),
 	name: z.string().min(1, "name is required."),
+  razonSocial: z.string().optional(),
 	departamento: z.string().optional(),
 	localidad: z.string().optional(),
 	direccion: z.string().optional(),
 	telefono: z.string().optional(),
+  rutOrCI: z.string().optional(),
 	clientId: z.string().min(1, "clientId is required."),
 })
 
@@ -84,6 +89,34 @@ export async function updateComClient(id: string, data: ComClientFormValues) {
   }
 
   return updated
+}
+
+export async function createOrUpdateComClient(data: ComClientFormValues) {
+  console.log("createOrUpdateComClient", data)
+  
+  const client= await getClient(data.clientId)
+  if (!client) {
+    throw new Error("client not found")
+  }
+
+  const comClient= await getFullComClientDAOByCode(data.code, data.clientId)
+  if (comClient) {
+    console.log("comClient found")
+    
+    const updated = await prisma.comClient.update({
+      where: {
+        id: comClient.id
+      },
+      data
+    })
+    return updated
+  } else {
+    console.log("comClient not found")
+    const created = await prisma.comClient.create({
+      data
+    })
+    return created
+  }
 }
 
 export async function deleteComClient(id: string) {

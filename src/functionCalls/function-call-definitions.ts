@@ -284,3 +284,115 @@ const insertLead=
         "required": ["conversationId", "name", "rutOrCI", "phone", "address"]
     }
 }
+
+const addItemToOrder= 
+{
+    "name": "addItemToOrder",
+    "description": "Añade un producto a un pedido y devuelve el pedido actualizado. Esta función es exclusiva para clientes existentes en el sistema.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido. Si se quiere crear un nuevo pedido, se debe utilizar el valor 'new'"
+            },
+            "comClientId": {
+                "type": "string",
+                "description": "Identificador del comClient que estará disponible en el prompt"
+            },
+            "productCode": {
+                "type": "string",
+                "description": "Código del producto"
+            },
+            "quantity": {
+                "type": "string",
+                "description": "Cantidad del producto para esta orden"
+            }
+        },
+        "required": ["orderId", "comClientId", "productCode", "quantity"]
+    }
+}
+
+const removeItemFromOrder=
+{
+    "name": "removeItemFromOrder",
+    "description": "Elimina un producto de un pedido y devuelve el pedido actualizado.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido"
+            },
+            "productCode": {
+                "type": "string",
+                "description": "Código del producto"
+            }
+        },
+        "required": ["orderId", "productCode"]
+    }
+}
+
+const changeQuantityOfItemInOrder=
+{
+    "name": "changeQuantityOfItemInOrder",
+    "description": "Cambia la cantidad de un producto en un pedido y devuelve el pedido actualizado.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido"
+            },
+            "productCode": {
+                "type": "string",
+                "description": "Código del producto"
+            },
+            "quantity": {
+                "type": "string",
+                "description": "Cantidad del producto para esta orden"
+            }
+        },
+        "required": ["orderId", "productCode", "quantity"]
+    }
+}
+
+const confirmOrder= 
+{
+    "name": "confirmOrder",
+    "description": "Confirma un pedido y devuelve el pedido actualizado",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido"
+            },
+            "note": {
+                "type": "string",
+                "description": "Pregunta esto al usuario: '¿Te gustaría agregar alguna nota al pedido?'. Si no quiere puedes omitir este parámetro"
+            }
+        },
+        "required": ["orderId"]
+    }
+}
+
+const cancelOrder= 
+{
+    "name": "cancelOrder",
+    "description": "Cancela un pedido y devuelve el pedido actualizado",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "orderId": {
+                "type": "string",
+                "description": "Identificador del pedido"
+            },
+            "note": {
+                "type": "string",
+                "description": "Pregunta esto al usuario: '¿Te gustaría agregar alguna nota a esta cancelación?'. Si no quiere puedes omitir este parámetro"
+            }
+        },
+        "required": ["orderId"]
+    }
+}
