@@ -74,7 +74,7 @@ export function OrderItemForm({ id, closeDialog }: Props) {
       
           <FormField
             control={form.control}
-            name="soldUnitPrice"
+            name="price"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>SoldUnitPrice</FormLabel>
@@ -87,49 +87,6 @@ export function OrderItemForm({ id, closeDialog }: Props) {
           />
           
       
-          <FormField
-            control={form.control}
-            name="soldName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SoldName</FormLabel>
-                <FormControl>
-                  <Input placeholder="OrderItem's soldName" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-      
-          <FormField
-            control={form.control}
-            name="soldCategory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SoldCategory</FormLabel>
-                <FormControl>
-                  <Input placeholder="OrderItem's soldCategory" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-      
-          <FormField
-            control={form.control}
-            name="soldImage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SoldImage</FormLabel>
-                <FormControl>
-                  <Input placeholder="OrderItem's soldImage" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           
       
           <FormField
