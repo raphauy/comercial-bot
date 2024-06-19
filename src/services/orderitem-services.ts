@@ -16,6 +16,7 @@ export type OrderItemDAO = {
 	quantity: number
   price: number | undefined
   currency: string | undefined
+  externalId: string | undefined
 	orderId: string
 	productId: string
 }
@@ -26,6 +27,7 @@ export const orderItemSchema = z.object({
 	quantity: z.number({required_error: "quantity is required."}),
   price: z.number().optional(),
   currency: z.string().optional(),
+  externalId: z.string().optional(),
   orderId: z.string().min(1, "orderId is required."),
 	productId: z.string().min(1, "productId is required."),
 })

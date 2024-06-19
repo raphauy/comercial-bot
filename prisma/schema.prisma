@@ -469,6 +469,7 @@ model OrderItem {
   quantity      Int       @default(1)                   // gennext: show.column
   price         Float?    @default(0)                   // gennext: show.column
   currency      String?   @default("$")                 // gennext: show.column
+  externalId    String?   @default("")                  // gennext: show.column
 
   order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId       String  

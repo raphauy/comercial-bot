@@ -198,6 +198,8 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
     name: productDAO.name,
     quantity: Number(quantity),
     price: productDAO.precioUSD,
+    currency: productDAO.currency,
+    externalId: productDAO.externalId,
   };
 
   const orderItem = await prisma.orderItem.findFirst({
@@ -545,6 +547,8 @@ export async function addBulkItemsToOrderImpl(clientId: string, orderId: string,
       name: productDAO.name,
       quantity: Number(product.quantity),
       price: productDAO.precioUSD,
+      currency: productDAO.currency,
+      externalId: productDAO.externalId,
     };
 
     const orderItem = await prisma.orderItem.findFirst({
@@ -635,6 +639,7 @@ export async function getOrderByPhone(clientId: string, phone: string) {
       quantity: item.quantity,
       price: item.price as number,
       currency: item.currency as string,
+      externalId: item.externalId,
     })),
   }
 
