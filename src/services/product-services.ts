@@ -78,6 +78,7 @@ export async function createOrUpdateProduct(data: ProductFormValues) {
     stock: data.stock,
     pedidoEnOrigen: data.pedidoEnOrigen,
     precioUSD: data.precioUSD,
+    currency: data.currency,
     categoryId: category.id,
     clientId: client.id
   }
