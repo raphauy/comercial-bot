@@ -59,7 +59,7 @@ export const columns: ColumnDef<OrderDAO>[] = [
               </div>
               <div className="flex-1 text-sm">
                 <p>{item.code}: {item.name}</p>
-                <p>{item.quantity} x {item.price} USD</p>
+                <p>{item.quantity} x {item.price} {item.currency}</p>
               </div>
             </div>
           ))}
