@@ -70,6 +70,8 @@ export async function completionInit(client: Client, functions: ChatCompletionCr
     agentes= notifyAgentes(name)
     leads= notifyLead(name)
     pedidos= notifyPedido(name)
+    console.log("******* notificarPedido: " + pedidos)
+    
 
     const stepResponse = await completionInit(client, functions, messages, recursionCount + 1, modelName)
     if (!stepResponse) return null

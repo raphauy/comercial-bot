@@ -1,17 +1,11 @@
 import { decodeAndCorrectText } from "@/lib/utils";
-import { getValue, setValue } from "./config-services";
+import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getClientsByDepartamentoImpl, getClientsByLocalidadImpl, getComClientDAOByCode, getFullComClientsDAOByVendor, getTopBuyersByDepartamentoAndVendorImpl, getTopBuyersByDepartamentoImpl, getTopBuyersImpl } from "./comclient-services";
 import { getDocumentDAO } from "./document-services";
-import { NarvaezFormValues, createOrUpdateNarvaez } from "./narvaez-services";
-import { sendWapMessage } from "./osomService";
-import { getSectionOfDocument } from "./section-services";
-import { SummitFormValues, createSummit } from "./summit-services";
-import { getConversation, messageArrived } from "./conversationService";
-import { CarServiceFormValues, createCarService } from "./carservice-services";
-import { revalidatePath } from "next/cache";
-import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
-import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getComClientDAOByCode, getClientsByDepartamentoImpl, getFullComClientsDAOByVendor, getClientsByLocalidadImpl, getTopBuyersImpl, getTopBuyersByDepartamentoImpl, getTopBuyersByDepartamentoAndVendorImpl } from "./comclient-services";
 import { LeadFormValues, createLead } from "./lead-services";
 import { addBulkItemsToOrderImpl, addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, removeItemFromOrderImpl } from "./order-services";
+import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
+import { getSectionOfDocument } from "./section-services";
+import { SummitFormValues, createSummit } from "./summit-services";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null

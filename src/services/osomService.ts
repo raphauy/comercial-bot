@@ -10,6 +10,9 @@ export async function sendWapMessage(phone: string, body: string, notificarAgent
   const client= await getClient(clientId)
   if (!client) throw new Error("Client not found")
 
+  if (notificarPedido)
+    console.log("Notificando pedido a Osom")
+
   if (process.env.NODE_ENV === 'development') {
     console.log("sendWapMessage simulator")
     return
