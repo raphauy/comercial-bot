@@ -13,13 +13,23 @@ import { Loader } from "lucide-react"
 
 type Props= {
   id?: string
+  clientId: string
   closeDialog: () => void
 }
 
-export function ComClientForm({ id, closeDialog }: Props) {
+export function ComClientForm({ id, clientId, closeDialog }: Props) {
   const form = useForm<ComClientFormValues>({
     resolver: zodResolver(comClientSchema),
-    defaultValues: {},
+    defaultValues: {
+      clientId,
+      code: "",
+      name: "",
+      departamento: "",
+      localidad: "",
+      direccion: "",
+      telefono: "",
+      rutOrCI: "",
+    },
     mode: "onChange",
   })
   const [loading, setLoading] = useState(false)
@@ -28,7 +38,7 @@ export function ComClientForm({ id, closeDialog }: Props) {
     setLoading(true)
     try {
       await createOrUpdateComClientAction(id ? id : null, data)
-      toast({ title: id ? "ComClient updated" : "ComClient created" })
+      toast({ title: id ? "Cliente actualizado" : "Cliente creado" })
       closeDialog()
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" })
@@ -147,25 +157,12 @@ export function ComClientForm({ id, closeDialog }: Props) {
           />
           
       
-          <FormField
-            control={form.control}
-            name="clientId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ClientId</FormLabel>
-                <FormControl>
-                  <Input placeholder="ComClient's clientId" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           
 
         <div className="flex justify-end">
-            <Button onClick={() => closeDialog()} type="button" variant={"secondary"} className="w-32">Cancel</Button>
+            <Button onClick={() => closeDialog()} type="button" variant={"secondary"} className="w-32">Cancelar</Button>
             <Button type="submit" className="w-32 ml-2">
-              {loading ? <Loader className="w-4 h-4 animate-spin" /> : <p>Save</p>}
+              {loading ? <Loader className="w-4 h-4 animate-spin" /> : <p>Guardar</p>}
             </Button>
           </div>
         </form>
@@ -174,7 +171,11 @@ export function ComClientForm({ id, closeDialog }: Props) {
   )
 }
 
-export function DeleteComClientForm({ id, closeDialog }: Props) {
+type DeleteProps= {
+  id: string
+  closeDialog: () => void
+}
+export function DeleteComClientForm({ id, closeDialog }: DeleteProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleDelete() {

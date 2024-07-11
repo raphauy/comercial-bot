@@ -10,12 +10,13 @@ import { getComClientDAOAction } from "./comclient-actions"
 
 type Props= {
   id?: string
+  clientId: string
 }
 
-const addTrigger= <Button><PlusCircle size={22} className="mr-2"/>Create ComClient</Button>
+const addTrigger= <Button><PlusCircle size={22} className="mr-2"/>Crear Cliente</Button>
 const updateTrigger= <Pencil size={30} className="pr-2 hover:cursor-pointer"/>
 
-export function ComClientDialog({ id }: Props) {
+export function ComClientDialog({ id, clientId }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -25,10 +26,10 @@ export function ComClientDialog({ id }: Props) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{id ? 'Update' : 'Create'} ComClient
+          <DialogTitle>{id ? 'Actualizar' : 'Crear'} Cliente
           </DialogTitle>
         </DialogHeader>
-        <ComClientForm closeDialog={() => setOpen(false)} id={id} />
+        <ComClientForm closeDialog={() => setOpen(false)} id={id} clientId={clientId} />
       </DialogContent>
     </Dialog>
   )

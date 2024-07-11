@@ -1,5 +1,5 @@
 import { columns } from "@/app/admin/comclients/comclient-columns"
-import { DeleteAllComClientsDialog } from "@/app/admin/comclients/comclient-dialogs"
+import { ComClientDialog, DeleteAllComClientsDialog } from "@/app/admin/comclients/comclient-dialogs"
 import { DataTable } from "@/app/admin/comclients/comclient-table"
 import { getClientBySlug } from "@/services/clientService"
 import { getFullComClientsDAO } from "@/services/comclient-services"
@@ -26,6 +26,11 @@ export default async function ComClientPage({ params }: Props) {
   return (
     <div className="w-full mt-4 space-y-8">      
     <h1 className="text-3xl font-bold text-center">Clientes</h1>
+
+      <div className="flex justify-end mx-auto my-2">
+        <ComClientDialog clientId={client.id} />
+      </div>
+
 
       <div className="container p-3 py-4 mx-auto bg-white border rounded-md dark:bg-black text-muted-foreground dark:text-white">
         <DataTable columns={columns} data={data} subject="Clientes" columnsOff={["localidad"]} departmentos={departamentosUnique} localidades={localidadesUnique}/>
