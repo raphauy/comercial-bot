@@ -64,6 +64,7 @@ export const columns: ColumnDef<OrderDAO>[] = [
             </div>
           ))}
           {data.note && <p className="mt-4 text-sm font-bold">Nota: {data.note}</p>}
+          {data.deliveryDate && <p className="mt-4 text-sm font-bold">Fecha de entrega: {data.deliveryDate}</p>}
         </div>
       )
     },

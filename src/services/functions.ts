@@ -424,17 +424,18 @@ export async function addItemToOrder(clientId: string, orderId: string, comClien
   }
 }
 
-export async function confirmOrder(clientId: string, orderId: string, note: string) {
+export async function confirmOrder(clientId: string, orderId: string, note: string, deliveryDate: string) {
   console.log("confirmOrder")
   console.log(`\torderId: ${orderId}`)
   console.log(`\tnote: ${note}`)
+  console.log(`\tdeliveryDate: ${deliveryDate}`)
 
   if (!orderId) {
     return "Parámetros incorrectos, orderId y note son obligatorios"
   }
 
   try {
-    const order= await confirmOrderImpl(orderId, note)
+    const order= await confirmOrderImpl(orderId, note, deliveryDate)
     if (!order) return "Error al confirmar la orden"
   
     console.log("orden actualizada")
@@ -658,7 +659,7 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "confirmOrder":
-      content= await confirmOrder(clientId, args.orderId, args.note)
+      content= await confirmOrder(clientId, args.orderId, args.note, args.deliveryDate)
       break
 
     case "cancelOrder":

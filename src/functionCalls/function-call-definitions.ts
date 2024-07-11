@@ -371,6 +371,10 @@ const confirmOrder=
             "note": {
                 "type": "string",
                 "description": "Pregunta esto al usuario: '¿Te gustaría agregar alguna nota al pedido?'. Si no quiere puedes omitir este parámetro"
+            },
+            "deliveryDate": {
+                "type": "string",
+                "description": "Pregunta esto al usuario: '¿Tienes alguna fecha de entrega preferida?'. Si no quiere puedes omitir este parámetro. Si hay fecha debe estar en este formato: YYYY-MM-DD"
             }
         },
         "required": ["orderId"]

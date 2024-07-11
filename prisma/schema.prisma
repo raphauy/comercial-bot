@@ -445,6 +445,7 @@ model Order {
   address       String?                                   // gennext: show.column
   city          String?                                   // gennext: show.column
   phone         String                                   // gennext: show.column
+  deliveryDate  String?                                 // gennext: show.column
 
   paymentMethod PaymentMethod?                            // gennext: show.column
 

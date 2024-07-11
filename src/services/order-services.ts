@@ -16,6 +16,7 @@ export type OrderDAO = {
 	address: string | undefined
 	city: string | undefined
 	phone: string
+  deliveryDate: string | undefined
 	paymentMethod: PaymentMethod | undefined
 	createdAt: Date
 	updatedAt: Date
@@ -137,6 +138,7 @@ type OrderResponse = {
   orderNumber: string
   status: string
   note: string | null
+  deliveryDate: string | null
   date: string
   items: ItemResponse[]
 }
@@ -236,6 +238,7 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
     note: updatedOrder.note,
+    deliveryDate: updatedOrder.deliveryDate,
     date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
@@ -288,9 +291,12 @@ export async function getTodayOrdersDAOByComClient(comClientId: string) {
   return orders as OrderDAO[]
 }
 
-export async function confirmOrderImpl(orderId: string, note?: string) {
+export async function confirmOrderImpl(orderId: string, note?: string, deliveryDate?: string) {
   if (!note) {
     note = ""
+  }
+  if (!deliveryDate) {
+    deliveryDate = ""
   }
   const order = await prisma.order.findUnique({
     where: {
@@ -307,7 +313,8 @@ export async function confirmOrderImpl(orderId: string, note?: string) {
     },
     data: {
       status: OrderStatus.Confirmed,
-      note: note,
+      note,
+      deliveryDate,
     },
     include: {
       orderItems: true,
@@ -323,6 +330,7 @@ export async function confirmOrderImpl(orderId: string, note?: string) {
     orderNumber: "#"+completeWithZeros(updated.orderNumber),
     status: updated.status,
     note: updated.note,
+    deliveryDate: updated.deliveryDate,
     date: updated.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updated.orderItems.map((item) => ({
       id: item.id,
@@ -372,6 +380,7 @@ export async function cancelOrderImpl(orderId: string, note?: string) {
     orderNumber: "#"+completeWithZeros(updated.orderNumber),
     status: updated.status,
     note: updated.note,
+    deliveryDate: updated.deliveryDate,
     date: updated.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updated.orderItems.map((item) => ({
       id: item.id,
@@ -425,6 +434,7 @@ export async function removeItemFromOrderImpl(orderId: string, productCode: stri
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
     note: updatedOrder.note,
+    deliveryDate: updatedOrder.deliveryDate,
     date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
@@ -480,6 +490,7 @@ export async function changeQuantityOfItemInOrderImpl(orderId: string, productCo
     orderNumber: "#"+completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
     note: updatedOrder.note,
+    deliveryDate: updatedOrder.deliveryDate,
     date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
@@ -586,6 +597,7 @@ export async function addBulkItemsToOrderImpl(clientId: string, orderId: string,
     orderNumber: "#" + completeWithZeros(updatedOrder.orderNumber),
     status: updatedOrder.status,
     note: updatedOrder.note,
+    deliveryDate: updatedOrder.deliveryDate,
     date: updatedOrder.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
     items: updatedOrder.orderItems.map((item) => ({
       id: item.id,
@@ -631,6 +643,7 @@ export async function getOrderByPhone(clientId: string, phone: string) {
     orderNumber: "#" + completeWithZeros(order.orderNumber),
     status: order.status,
     note: order.note,
+    deliveryDate: order.deliveryDate,
     date: order.updatedAt.toLocaleString("es-UY", {timeZone: "America/Montevideo"}),
    items: order.orderItems.map((item) => ({
       id: item.id,
