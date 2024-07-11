@@ -124,7 +124,7 @@ export const columns: ColumnDef<ComClientDAO>[] = [
       return (
         <div className="flex items-center justify-end gap-2">
 
-          <ComClientDialog id={data.id} />
+          <ComClientDialog id={data.id} clientId={data.clientId} />
           <DeleteComClientDialog description={deleteDescription} id={data.id} />
         </div>
 
