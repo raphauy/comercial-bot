@@ -136,6 +136,7 @@ type ItemResponse = {
 type OrderResponse = {
   orderId: string
   orderNumber: string
+  clientCode?: string
   status: string
   note: string | null
   deliveryDate: string | null
@@ -622,15 +623,16 @@ export async function getOrderByPhone(clientId: string, phone: string) {
         telefono: phone
       },
       status: OrderStatus.Confirmed,
-      updatedAt: {
-        gte: new Date(Date.now() - (24 * 60 * 60 * 1000)),
-      }
+      // updatedAt: {
+      //   gte: new Date(Date.now() - (24 * 60 * 60 * 1000)),
+      // }
     },
     orderBy: {
       updatedAt: 'desc'
     },
     include: {
       orderItems: true,
+      comClient: true,
     }
   })
 
@@ -641,6 +643,7 @@ export async function getOrderByPhone(clientId: string, phone: string) {
   const res: OrderResponse = {
     orderId: order.id,
     orderNumber: "#" + completeWithZeros(order.orderNumber),
+    clientCode: order.comClient.code,
     status: order.status,
     note: order.note,
     deliveryDate: order.deliveryDate,
