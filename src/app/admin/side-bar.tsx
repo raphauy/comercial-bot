@@ -93,15 +93,7 @@ export default function SideBar() {
             </Link>
           )
         })}
-        {/* <Link href="/admin/narvaez" className={cn(commonClasses, path.endsWith("narvaez") && selectedClasses)}>
-          <Warehouse size={23} />
-          <p className={cn("hidden md:block md:w-36")}>Narvaez</p>
-        </Link> */}
 
-      </section>
-      <section className="mb-4">
-        {divider()}
-        
         <Link href={`/admin/config?clientId=${firstClientId}`} className={cn(commonClasses, path.endsWith("/admin/config") && selectedClasses)}>
           <Settings />
           <p className={cn("hidden md:block md:w-36")}>Configuración</p>                  

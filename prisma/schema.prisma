@@ -139,6 +139,7 @@ model Conversation {
   tipo        String?
   zona        String?
   presupuesto String?
+  closed      Boolean  @default(false)
 
   narvaez     Narvaez?
   summit      Summit?
