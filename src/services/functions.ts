@@ -300,11 +300,12 @@ export async function getBuyersOfProductByCategory(clientId: string, categoryNam
   return result
 }
 
-export async function getClientsByDepartamento(clientId: string, departamento: string) {
+export async function getClientsByDepartamento(clientId: string, departamento: string, limit: number = 10) {
   console.log("getClientsByDepartamento")
   console.log(`\tdepartamento: ${departamento}`)
+  console.log(`\tlimit: ${limit}`)
   
-  const result= await getClientsByDepartamentoImpl(clientId, departamento)
+  const result= await getClientsByDepartamentoImpl(clientId, departamento, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetClientsByDepartamento: ${result.length} clientes encontrados`)  
@@ -312,11 +313,12 @@ export async function getClientsByDepartamento(clientId: string, departamento: s
   return result
 }
 
-export async function getClientsByLocalidad(clientId: string, localidad: string) {
+export async function getClientsByLocalidad(clientId: string, localidad: string, limit: number = 10) {
   console.log("getClientsByLocalidad")
   console.log(`\tlocalidad: ${localidad}`)
+  console.log(`\tlimit: ${limit}`)
   
-  const result= await getClientsByLocalidadImpl(clientId, localidad)
+  const result= await getClientsByLocalidadImpl(clientId, localidad, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetClientsByLocalidad: ${result.length} clientes encontrados`)  
@@ -627,11 +629,11 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getClientsByDepartamento":
-      content= await getClientsByDepartamento(clientId, args.departamento)
+      content= await getClientsByDepartamento(clientId, args.departamento, args.limit)
       break
 
     case "getClientsByLocalidad":
-      content= await getClientsByLocalidad(clientId, args.localidad)
+      content= await getClientsByLocalidad(clientId, args.localidad, args.limit)
       break
 
     case "getProductsRecomendationsForClient":

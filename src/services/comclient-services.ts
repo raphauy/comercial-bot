@@ -211,7 +211,7 @@ type ClientResult = {
 }
 
 
-export async function getClientsByDepartamentoImpl(clientId: string, departamento: string): Promise<ClientResult[]> {
+export async function getClientsByDepartamentoImpl(clientId: string, departamento: string, limit: number = 10): Promise<ClientResult[]> {
   const found = await prisma.comClient.findMany({
     where: {
       clientId: clientId,
@@ -224,7 +224,7 @@ export async function getClientsByDepartamentoImpl(clientId: string, departament
       client: true,
       sells: true,
     },
-    take: 10,
+    take: limit,
   })
 
   const res: ClientResult[] = found.map(client => ({
@@ -238,7 +238,7 @@ export async function getClientsByDepartamentoImpl(clientId: string, departament
   return res
 }
 
-export async function getClientsByLocalidadImpl(clientId: string, localidad: string): Promise<ClientResult[]> {
+export async function getClientsByLocalidadImpl(clientId: string, localidad: string, limit: number = 10): Promise<ClientResult[]> {
   const found = await prisma.comClient.findMany({
     where: {
       clientId: clientId,
@@ -251,7 +251,7 @@ export async function getClientsByLocalidadImpl(clientId: string, localidad: str
       client: true,
       sells: true,
     },
-    take: 10,
+    take: limit,
   });
 
   const res: ClientResult[] = found.map(client => ({

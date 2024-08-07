@@ -168,6 +168,10 @@ const getClientsByDepartamento=
             "departamento": {
                 "type": "string",
                 "description": "Nombre del departamento"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["departamento"]
@@ -184,6 +188,10 @@ const getClientsByLocalidad=
             "localidad": {
                 "type": "string",
                 "description": "Nombre de la localidad"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["localidad"]
