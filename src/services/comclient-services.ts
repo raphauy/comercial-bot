@@ -439,15 +439,15 @@ export async function getBuyersOfProductByCategoryImpl(clientId: string, categor
   const found = await prisma.comClient.findMany({
     where: {
       clientId,
-      sells: {
-        some: {
-          product: {
-            category: {
-              name: categoryName
-            }
-          }
-        }
-      }
+      // sells: {
+      //   some: {
+      //     product: {
+      //       category: {
+      //         name: categoryName
+      //       }
+      //     }
+      //   }
+      // }
     },
     include: {
 			client: true,
@@ -463,7 +463,14 @@ export async function getBuyersOfProductByCategoryImpl(clientId: string, categor
 		},
   })
 
-  const clientsWithSellCounts = found.map(client => ({
+  // Filtrar en JavaScript
+  const filteredResults = found.filter(client => 
+    client.sells.some(sell =>
+      sell.product.category.name.toLowerCase() === categoryName.toLowerCase()
+    )
+  );
+
+  const clientsWithSellCounts = filteredResults.map(client => ({
     // aggregate all quantity of products of the same category
     cantCompras: client.sells.filter(sell => sell.product.category.name === categoryName).reduce((acc, sell) => acc + sell.quantity, 0),
     cliente: {
