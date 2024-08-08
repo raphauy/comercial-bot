@@ -245,7 +245,7 @@ export async function getFullProductDAOByRanking(clientId: string, externalId: s
   return res
 }
 
-export async function getFullProductDAOByCategoryName(clientId: string, categoryName: string, limit: number = 5): Promise<ProductDAO[] | null> {
+export async function getFullProductDAOByCategoryName(clientId: string, categoryName: string, limit: number = 10): Promise<ProductDAO[] | null> {
   const found = await prisma.product.findMany({
     where: {
       clientId,

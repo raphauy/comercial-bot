@@ -213,7 +213,7 @@ export default function SimulatorBox() {
               key={i}
               className={clsx(
                 "flex w-full px-1 items-center justify-center border-b border-gray-200 py-4",
-                message.role === "user" ? "bg-gray-100" : "bg-white",
+                message.role === "user" ? "bg-gray-100 dark:bg-gray-800" : "bg-background",
               )}
             >
               <div className="flex items-start w-full max-w-screen-md px-5 space-x-4 sm:px-0">
@@ -235,7 +235,7 @@ export default function SimulatorBox() {
                 </div>
                 {message.role !== "system" &&
                   <ReactMarkdown
-                    className="w-full mt-1 prose break-words prose-p:leading-relaxed"
+                    className="w-full mt-1 prose break-words prose-p:leading-relaxed dark:prose-invert"
                     remarkPlugins={[remarkGfm]}
                     components={{
                       // open links in new tab
@@ -264,7 +264,7 @@ export default function SimulatorBox() {
         ) : client?.nombre && (
           <div className="max-w-screen-md mx-5 border rounded-md border-gray-200sm:mx-0 sm:w-full">
             <div className="flex flex-col space-y-4 p-7 sm:p-10">
-              <h1 className="text-lg font-semibold text-black">
+              <h1 className="text-lg font-semibold">
                 Bienvenido al asistente de {client?.nombre}!
               </h1>
               <p className="text-gray-500">
@@ -277,11 +277,11 @@ export default function SimulatorBox() {
 
       {error && <p className="mt-10 text-base text-center text-red-500">{JSON.parse(error.message).error}</p>}
 
-      <div className="fixed bottom-0 flex flex-col items-center w-full p-5 pb-3 space-y-3 max-w-[350px] sm:max-w-[400px] md:max-w-[550px] lg:max-w-screen-md bg-gradient-to-b from-transparent via-gray-100 to-gray-100 sm:px-0">
+      <div className="fixed bottom-0 flex flex-col items-center w-full p-5 pb-3 space-y-3 max-w-[350px] sm:max-w-[400px] md:max-w-[550px] lg:max-w-screen-md sm:px-0">
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="relative w-full px-4 pt-3 pb-2 bg-white border border-gray-200 shadow-lg rounded-xl sm:pb-3 sm:pt-4"
+          className="relative w-full px-4 pt-3 pb-2 border border-gray-200 shadow-lg rounded-xl sm:pb-3 sm:pt-4"
         >
           <Textarea
             ref={inputRef}
@@ -299,13 +299,13 @@ export default function SimulatorBox() {
               }
             }}
             spellCheck={false}
-            className="w-full pr-10 focus:outline-none"
+            className="w-full pr-10 focus:outline-none bg-background"
           />
           <button
             className={clsx(
-              "absolute inset-y-0 right-4 my-auto flex h-8 w-8 items-center justify-center rounded-md transition-all",
+              "absolute inset-y-0 right-4 my-auto flex h-8 w-8 items-center justify-center rounded-md transition-all bg-background",
               disabled
-                ? "cursor-not-allowed bg-white"
+                ? "cursor-not-allowed"
                 : "bg-green-500 hover:bg-green-600",
             )}
             disabled={disabled}
@@ -349,7 +349,7 @@ export default function SimulatorBox() {
               href="https://www.osomdigital.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-black"
+              className="transition-colors hover:text-black dark:hover:text-white"
             >            
               Osom Digital
             </a>

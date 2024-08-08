@@ -190,11 +190,12 @@ export async function getProductByRanking(clientId: string, ranking: string) {
   return res
 }
 
-export async function getProductsByCategoryName(clientId: string, categoryName: string) {
+export async function getProductsByCategoryName(clientId: string, categoryName: string, limit: number = 10) {
   console.log("getProductsByCategoryName")
   console.log(`\tcategoryName: ${categoryName}`)
+  console.log(`\tlimit: ${limit}`)
   
-  const result= await getFullProductDAOByCategoryName(clientId, categoryName)
+  const result= await getFullProductDAOByCategoryName(clientId, categoryName, limit)
   if (!result || result.length === 0) return "No se encontraron productos"
 
   console.log(`\tgetProductsByCategoryName: ${result.length} productos encontrados`)
@@ -264,23 +265,24 @@ export async function getClientsOfVendor(clientId: string, vendorName: string) {
   return result
 }
 
-export async function getBuyersOfProductByCode(clientId: string, code: string) {
+export async function getBuyersOfProductByCode(clientId: string, code: string, limit: number = 10) {
   console.log("getBuyersOfProductByCode")
   console.log(`\tproductCode: ${code}`)
+  console.log(`\tlimit: ${limit}`)
   
-  const result= await getBuyersOfProductByCodeImpl(clientId, code)
+  const result= await getBuyersOfProductByCodeImpl(clientId, code, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
-  console.log(`\tgetBuyersOfProductByCode: ${result.length} clientes encontrados`)  
+  console.log(`\tgetBuyersOfProductByCode: ${result.length} encontrados`)  
 
   return result
 }
 
-export async function getBuyersOfProductByRanking(clientId: string, ranking: string) {
+export async function getBuyersOfProductByRanking(clientId: string, ranking: string, limit: number = 10) {
   console.log("getBuyersOfProductByRanking")
   console.log(`\tranking: ${ranking}`)
   
-  const result= await getBuyersOfProductByRankingImpl(clientId, ranking)
+  const result= await getBuyersOfProductByRankingImpl(clientId, ranking, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetBuyersOfProductByRanking: ${result.length} clientes encontrados`)  
@@ -288,11 +290,12 @@ export async function getBuyersOfProductByRanking(clientId: string, ranking: str
   return result
 }
 
-export async function getBuyersOfProductByCategory(clientId: string, categoryName: string) {
+export async function getBuyersOfProductByCategory(clientId: string, categoryName: string, limit: number = 10) {
   console.log("getBuyersOfProductByCategory")
   console.log(`\tcategoryName: ${categoryName}`)
+  console.log(`\tlimit: ${limit}`)
   
-  const result= await getBuyersOfProductByCategoryImpl(clientId, categoryName)
+  const result= await getBuyersOfProductByCategoryImpl(clientId, categoryName, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetBuyersOfProductByCategory: ${result.length} clientes encontrados`)  
@@ -326,12 +329,12 @@ export async function getClientsByLocalidad(clientId: string, localidad: string,
   return result
 }
 
-export async function getProductsRecomendationsForClient(clientId: string, clientName: string) {
+export async function getProductsRecomendationsForClient(clientId: string, clientName: string, limit: number = 10) {
   console.log("getProductsRecomendationsForClient")
   console.log(`\tclientName: ${clientName}`)
   
   try {
-    const result= await getProductsRecomendationsForClientImpl(clientId, clientName)
+    const result= await getProductsRecomendationsForClientImpl(clientId, clientName, limit)
     if (!result || result.length === 0) return "No se encontraron productos"
 
     console.log(`\tgetProductsRecomendationsForClient: ${result.length} productos encontrados`)  
@@ -346,24 +349,24 @@ export async function getProductsRecomendationsForClient(clientId: string, clien
     }
 }
 
-export async function getTopBuyers(clientId: string) {
-  const result = await getTopBuyersImpl(clientId, 10)
+export async function getTopBuyers(clientId: string, limit: number = 10) {
+  const result = await getTopBuyersImpl(clientId, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetTopBuyers: ${result.length} clientes encontrados`)  
   return result
 }
 
-export async function getTopBuyersByDepartamento(clientId: string, departamento: string) {
-  const result = await getTopBuyersByDepartamentoImpl(clientId, departamento, 10)
+export async function getTopBuyersByDepartamento(clientId: string, departamento: string, limit: number = 10) {
+  const result = await getTopBuyersByDepartamentoImpl(clientId, departamento, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetTopBuyersByDepartamento: ${result.length} clientes encontrados`)  
   return result
 }
 
-export async function getTopBuyersByDepartamentoAndVendor(clientId: string, departamento: string, vendorName: string) {
-  const result = await getTopBuyersByDepartamentoAndVendorImpl(clientId, departamento, vendorName, 10)
+export async function getTopBuyersByDepartamentoAndVendor(clientId: string, departamento: string, vendorName: string, limit: number = 10) {
+  const result = await getTopBuyersByDepartamentoAndVendorImpl(clientId, departamento, vendorName, limit)
   if (!result || result.length === 0) return "No se encontraron clientes"
 
   console.log(`\tgetTopBuyersByDepartamentoAndVendor: ${result.length} clientes encontrados`)  
@@ -597,7 +600,7 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getProductsByCategoryName":
-      content= await getProductsByCategoryName(clientId, args.categoryName)
+      content= await getProductsByCategoryName(clientId, args.categoryName, args.limit)
       break
 
     case "getProductsByName":
@@ -617,15 +620,15 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getBuyersOfProductByCode":
-      content= await getBuyersOfProductByCode(clientId, args.code)
+      content= await getBuyersOfProductByCode(clientId, args.code, args.limit)
       break
 
     case "getBuyersOfProductByRanking":
-      content= await getBuyersOfProductByRanking(clientId, args.ranking)
+      content= await getBuyersOfProductByRanking(clientId, args.ranking, args.limit)
       break
     
     case "getBuyersOfProductByCategory":
-      content= await getBuyersOfProductByCategory(clientId, args.categoryName)
+      content= await getBuyersOfProductByCategory(clientId, args.categoryName, args.limit)
       break
 
     case "getClientsByDepartamento":
@@ -637,19 +640,19 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getProductsRecomendationsForClient":
-      content= await getProductsRecomendationsForClient(clientId, args.clientName)
+      content= await getProductsRecomendationsForClient(clientId, args.clientName, args.limit)
       break
 
     case "getTopBuyers":
-      content= await getTopBuyers(clientId)
+      content= await getTopBuyers(clientId, args.limit)
       break
 
     case "getTopBuyersByDepartamento":
-      content= await getTopBuyersByDepartamento(clientId, args.departamento)
+      content= await getTopBuyersByDepartamento(clientId, args.departamento, args.limit)
       break
 
     case "getTopBuyersByDepartamentoAndVendor":
-      content= await getTopBuyersByDepartamentoAndVendor(clientId, args.departamento, args.vendorName)
+      content= await getTopBuyersByDepartamentoAndVendor(clientId, args.departamento, args.vendorName, args.limit)
       break
 
     case "insertLead":

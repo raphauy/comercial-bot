@@ -56,6 +56,10 @@ const getProductsByCategoryName=
             "categoryName": {
                 "type": "string",
                 "description": "Nombre de la categoría"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de productos a devolver, valor por defecto es 10"
             }
         },
         "required": ["categoryName"]
@@ -120,6 +124,10 @@ const getBuyersOfProductByCode=
             "code": {
                 "type": "string",
                 "description": "Código del producto"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["code"]
@@ -136,6 +144,10 @@ const getBuyersOfProductByRanking=
             "ranking": {
                 "type": "string",
                 "description": "Número de Ranking del producto"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["ranking"]
@@ -152,6 +164,10 @@ const getBuyersOfProductByCategory=
             "categoryName": {
                 "type": "string",
                 "description": "Nombre de la categoría del producto"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["categoryName"]
@@ -208,6 +224,10 @@ const getProductsRecomendationsForClient=
             "clientName": {
                 "type": "string",
                 "description": "Nombre del cliente"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de productos a devolver, valor por defecto es 10"
             }
         },
         "required": ["clientName"]
@@ -217,20 +237,33 @@ const getProductsRecomendationsForClient=
 const getTopBuyers=
 {
     "name": "getTopBuyers",
-    "description": "Devuelve un array de clientes ordenados por la cantidad de ventas totales.",
-    "parameters": {}
+    "description": "Devuelve un array de clientes ordenados por la cantidad de ventas totales. Son los clientes que más compran productos de la empresa.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
+            }
+        },
+        "required": []
+    }
 }
 
 const getTopBuyersByDepartamento=
 {
     "name": "getTopBuyersByDepartamento",
-    "description": "Devuelve un array de clientes de un determinado departamento ordenados por la cantidad de ventas.",
+    "description": "Devuelve un array de clientes de un determinado departamento ordenados por la cantidad de ventas. Son los clientes que más compran en ese departamento.",
     "parameters": {
         "type": "object",
         "properties": {
             "departamento": {
                 "type": "string",
                 "description": "Nombre del departamento"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["departamento"]
@@ -240,7 +273,7 @@ const getTopBuyersByDepartamento=
 const getTopBuyersByDepartamentoAndVendor=
 {
     "name": "getTopBuyersByDepartamentoAndVendor",
-    "description": "Devuelve un array de clientes de un determinado departamento y vendedor ordenados por la cantidad de ventas.",
+    "description": "Devuelve un array de clientes de un determinado departamento y vendedor ordenados por la cantidad de ventas. Son los clientes que más compran en ese departamento y a ese vendedor.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -251,6 +284,10 @@ const getTopBuyersByDepartamentoAndVendor=
             "vendorName": {
                 "type": "string",
                 "description": "Nombre del vendedor"
+            },
+            "limit": {
+                "type": "number",
+                "description": "Cantidad máxima de clientes a devolver, valor por defecto es 10"
             }
         },
         "required": ["departamento", "vendorName"]

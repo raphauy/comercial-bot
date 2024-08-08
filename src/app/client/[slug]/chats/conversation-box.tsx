@@ -105,7 +105,7 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
             <div key={i} className="w-full">
               <div className={clsx(
                   "flex w-full items-center justify-between px-1 lg:px-4 border-b border-gray-200 py-5",
-                  message.role === "user" ? "bg-gray-100" : "bg-white",
+                  message.role === "user" ? "bg-gray-100 dark:bg-gray-800" : "bg-background",
                 )}
               >
                 <div className="flex items-center w-full max-w-screen-md px-5 space-x-4 sm:px-0">
@@ -140,7 +140,7 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
                   </Accordion> :
                     <div className="w-full">
                       <ReactMarkdown                        
-                        className="prose break-words prose-p:leading-relaxed"
+                        className="prose break-words prose-p:leading-relaxed dark:prose-invert"
                         remarkPlugins={[remarkGfm]}
                         components={{
                           // open links in new tab

@@ -342,7 +342,7 @@ type BuyCountResult = {
   }
 }
 
-export async function getBuyersOfProductByCodeImpl(clientId: string, productCode: string): Promise<BuyCountResult[]> {
+export async function getBuyersOfProductByCodeImpl(clientId: string, productCode: string, limit: number = 10): Promise<BuyCountResult[]> {
   const found = await prisma.comClient.findMany({
     where: {
       clientId,
@@ -376,12 +376,12 @@ export async function getBuyersOfProductByCodeImpl(clientId: string, productCode
     }
   }))
   .sort((a, b) => b.cantCompras - a.cantCompras)
-  .slice(0, 10); 
+  .slice(0, limit);
 
   return clientsWithSellCounts as BuyCountResult[]
 }
 
-export async function getBuyersOfProductByRankingImpl(clientId: string, productRanking: string): Promise<BuyCountResult[]> {
+export async function getBuyersOfProductByRankingImpl(clientId: string, productRanking: string, limit: number = 10): Promise<BuyCountResult[]> {
   const found = await prisma.comClient.findMany({
     where: {
       clientId,
@@ -415,12 +415,12 @@ export async function getBuyersOfProductByRankingImpl(clientId: string, productR
     }
   }))
   .sort((a, b) => b.cantCompras - a.cantCompras)
-  .slice(0, 10); 
+  .slice(0, limit);
 
   return clientsWithSellCounts as BuyCountResult[]
 }
 
-export async function getBuyersOfProductByCategoryImpl(clientId: string, categoryName: string): Promise<BuyCountResult[]> {
+export async function getBuyersOfProductByCategoryImpl(clientId: string, categoryName: string, limit: number = 10): Promise<BuyCountResult[]> {
   if (categoryName === "12v")
     categoryName = "12V"
   else if (categoryName === "220v")
@@ -476,7 +476,7 @@ export async function getBuyersOfProductByCategoryImpl(clientId: string, categor
     }
   }))
   .sort((a, b) => b.cantCompras - a.cantCompras)
-  .slice(0, 10); 
+  .slice(0, limit);
 
   return clientsWithSellCounts as BuyCountResult[]
 }
