@@ -157,7 +157,7 @@ const getBuyersOfProductByRanking=
 const getBuyersOfProductByCategory=
 {
     "name": "getBuyersOfProductByCategory",
-    "description": "Devuelve los principales compradores de un producto a partir de la categoría del producto. Estas son las principales categorías: 12v, 20v, 220v, Consumibles, Explosion, Manuales",
+    "description": "Devuelve los principales compradores de un producto a partir de la categoría del producto. Estas son las principales categorías: Herramientas, Pinturas, Cintas, Limpieza.",
     "parameters": {
         "type": "object",
         "properties": {

@@ -124,6 +124,15 @@ export async function deleteProduct(id: string) {
 
 export async function deleteAllProductsByClient(clientId: string) {
   try {
+    // delete all orders
+    await prisma.order.deleteMany({
+      where: {
+        comClient: {
+          clientId
+        }
+      },
+    })
+    // delete all products
     await prisma.product.deleteMany({
       where: {
         clientId
