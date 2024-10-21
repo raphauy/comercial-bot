@@ -320,13 +320,13 @@ export async function getComClientDAOByPhone(clientId: string, phone: string) {
   let found = await prisma.comClient.findFirst({
     where: {
       clientId,
-      telefono: phone
+      telefono: {
+        contains: phone,
+        mode: 'insensitive'
+      }
     },
   })
-  if (found) {
-    return found
-  }
-
+  
   return found
 }
 
@@ -715,3 +715,4 @@ export async function deleteAllComClientsByClient(clientId: string): Promise<boo
     return false
   }
 }
+
