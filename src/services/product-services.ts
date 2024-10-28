@@ -219,7 +219,10 @@ export async function getFullProductDAOByCode(clientId: string, code: string) {
   const found = await prisma.product.findFirst({
     where: {
       clientId,
-      code
+      code,
+      stock: {
+        gt: 0
+      }
     },
     include: {
 			category: true,
