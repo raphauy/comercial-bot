@@ -620,7 +620,10 @@ export async function getOrderByPhone(clientId: string, phone: string) {
         client: {
           id: clientId
         },
-        telefono: phone
+        telefono: {
+          contains: phone,
+          mode: 'insensitive'
+        }
       },
       status: OrderStatus.Confirmed,
       updatedAt: {
