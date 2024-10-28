@@ -69,6 +69,7 @@ export async function createOrUpdateSell(data: SellFormValues) {
       localidad: data.localidad,
       direccion: data.direccion,
       telefono: data.telefono,
+      status: "ACTIVE",
     }
     const comClient= await createComClient(newComClientForm)
     comClientId = comClient.id

@@ -5,6 +5,7 @@ import { getClient, getClientBySlug } from "./clientService"
 import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
 import { clientSimilaritySearch, getFullComClientDAOByCode } from "./comclient-services"
+import { quitarTildes } from "@/lib/utils"
 
 export type ProductDAO = {
 	id: string
@@ -238,7 +239,10 @@ export async function getFullProductDAOByRanking(clientId: string, externalId: s
   const found = await prisma.product.findFirst({
     where: {
       clientId,
-      externalId
+      externalId,
+      stock: {
+        gt: 0
+      }
     },
     include: {
 			category: true,
@@ -255,6 +259,7 @@ export async function getFullProductDAOByRanking(clientId: string, externalId: s
 }
 
 export async function getFullProductDAOByCategoryName(clientId: string, categoryName: string, limit: number = 10): Promise<ProductDAO[] | null> {
+  categoryName= quitarTildes(categoryName)
   const found = await prisma.product.findMany({
     where: {
       clientId,
@@ -263,6 +268,9 @@ export async function getFullProductDAOByCategoryName(clientId: string, category
           equals: categoryName,
           mode: "insensitive"
         }
+      },
+      stock: {
+        gt: 0
       }
     },
     include: {
@@ -314,6 +322,9 @@ export async function getComplmentaryProducts(clientId: string, productList: str
       },
       id: {
         notIn: productList
+      },
+      stock: {
+        gt: 0
       }
     },
     include: {
@@ -358,7 +369,7 @@ export async function getProductsRecomendationsForClientImpl(clientId: string, c
       
       const complementaryProducts= await getComplmentaryProducts(clientId, productsList, categoriesList, limit)
       for (const product of complementaryProducts) {
-        console.log(product.externalId, product.code, product.name, product.categoryName)        
+        console.log(product.externalId, product.code, product.name, product.categoryName, product.stock)        
       }
       const result: ProductRecomendationResult[] = []
       for (const product of complementaryProducts) {
@@ -418,7 +429,7 @@ export async function productSimilaritySearch(clientId: string, text: string, li
     SELECT p."externalId", p."code", p."name", p."stock", p."pedidoEnOrigen", p."precioUSD", p."currency", c."name" AS "categoryName", p."embedding" <-> ${textEmbedding}::vector AS distance
     FROM "Product" AS p
     INNER JOIN "Category" AS c ON p."categoryId" = c."id" 
-    WHERE p."clientId" = ${clientId} AND p."embedding" <-> ${textEmbedding}::vector < 1.3
+    WHERE p."clientId" = ${clientId} AND p."stock" > 0 AND p."embedding" <-> ${textEmbedding}::vector < 1.3
     ORDER BY distance
     LIMIT ${limit}`;
 
@@ -442,4 +453,5 @@ export async function productSimilaritySearch(clientId: string, text: string, li
 
   return result;
 }
+
 

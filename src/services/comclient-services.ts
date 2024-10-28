@@ -4,6 +4,7 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai"
 import pgvector from 'pgvector/utils';
 import { getFullVendorDAO, getFullVendorDAOByName, vendorSimilaritySearch } from "./vendor-services";
 import { getClient } from "./clientService";
+import { ComClientStatus } from "@prisma/client";
 
 export type ComClientDAO = {
 	id: string
@@ -15,6 +16,7 @@ export type ComClientDAO = {
 	direccion: string | undefined
 	telefono: string | undefined
   rutOrCI: string | undefined
+  status: ComClientStatus
 	clientId: string
   createdAt: Date
   updatedAt: Date
@@ -30,6 +32,7 @@ export const comClientSchema = z.object({
 	telefono: z.string().optional(),
   rutOrCI: z.string().optional(),
 	clientId: z.string().min(1, "clientId is required."),
+  status: z.nativeEnum(ComClientStatus)
 })
 
 export type ComClientFormValues = z.infer<typeof comClientSchema>
@@ -101,20 +104,12 @@ export async function createOrUpdateComClient(data: ComClientFormValues) {
 
   const comClient= await getFullComClientDAOByCode(data.code, data.clientId)
   if (comClient) {
-    console.log("comClient found")
-    
-    const updated = await prisma.comClient.update({
-      where: {
-        id: comClient.id
-      },
-      data
-    })
+    console.log("comClient found")    
+    const updated = await updateComClient(comClient.id, data)
     return updated
   } else {
     console.log("comClient not found")
-    const created = await prisma.comClient.create({
-      data
-    })
+    const created = await createComClient(data)
     return created
   }
 }
@@ -176,7 +171,8 @@ export async function getFullComClientsDAOByVendor(clientId: string, vendorName:
           vendorId: vendor.id
         }
       },
-      clientId: clientId
+      clientId: clientId,
+      status: ComClientStatus.ACTIVE
     },
     include: {
       client: true,
@@ -218,7 +214,8 @@ export async function getClientsByDepartamentoImpl(clientId: string, departament
       departamento: {
         equals: departamento.toLowerCase(),
         mode: "insensitive"
-      }
+      },
+      status: ComClientStatus.ACTIVE
     },
     include: {
       client: true,
@@ -245,7 +242,8 @@ export async function getClientsByLocalidadImpl(clientId: string, localidad: str
       localidad: {
         equals: localidad.toLowerCase(),
         mode: "insensitive"
-      }
+      },
+      status: ComClientStatus.ACTIVE
     },
     include: {
       client: true,
@@ -296,7 +294,8 @@ export async function getComClientDAOByCode(clientId: string, code: string) {
   let found = await prisma.comClient.findFirst({
     where: {
       clientId,
-      code
+      code,
+      status: ComClientStatus.ACTIVE
     },
   })
   if (found) {
@@ -666,7 +665,7 @@ export async function clientSimilaritySearch(clientId: string, text: string, lim
   const similarityResult: any[] = await prisma.$queryRaw`
     SELECT c."id", c."code", c."name", c."departamento", c."localidad", c."direccion", c."telefono", c."embedding" <-> ${textEmbedding}::vector AS distance 
     FROM "ComClient" AS c
-    WHERE c."clientId" = ${clientId} AND c."embedding" <-> ${textEmbedding}::vector < 1.3
+    WHERE c."clientId" = ${clientId} AND c."status" = 'ACTIVE' AND c."embedding" <-> ${textEmbedding}::vector < 1.3
     ORDER BY distance
     LIMIT ${limit}`;
 

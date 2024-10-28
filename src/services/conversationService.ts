@@ -1,15 +1,15 @@
 import { prisma } from "@/lib/db";
 
 import { BillingData, CompleteData } from "@/app/admin/billing/actions";
-import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
-import { getContext, getFunctionsDefinitions } from "./function-services";
-import { sendWapMessage } from "./osomService";
-import { googleCompletionInit } from "./google-function-call-services";
 import { ChatCompletion } from "groq-sdk/resources/chat/completions.mjs";
-import { getFullModelDAO, getFullModelDAOByName } from "./model-services";
-import { completionInit } from "./function-call-services";
+import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
+import { completionInit, getContext } from "./function-call-services";
+import { getFunctionsDefinitions } from "./function-services";
+import { getDocument } from "./functions";
+import { googleCompletionInit } from "./google-function-call-services";
 import { groqCompletionInit } from "./groq-function-call-services";
-import { getClient } from "./clientService";
+import { getFullModelDAO, getFullModelDAOByName } from "./model-services";
+import { sendWapMessage } from "./osomService";
 
 
 export default async function getConversations() {
@@ -233,7 +233,7 @@ export async function processMessage(id: string, modelName?: string) {
   const providerName= model.providerName
 
   if (providerName === "OpenAI") {
-    completionResponse= await completionInit(client,functions, messages, 0, modelName)
+    completionResponse= await completionInit(conversation.phone, client, functions, messages, 0, modelName)
   } else if (providerName === "Google") {
     completionResponse= await googleCompletionInit(client,functions, messages, systemMessage.content, modelName)
   } else if (providerName === "Groq") {
@@ -487,4 +487,49 @@ export async function closeConversation(conversationId: string) {
   })
 
   return updated
+}
+
+export async function saveFunction(phone: string, completion: string, clientId: string) {
+  console.log("function call")
+
+  // Buscar el inicio y el final del JSON dentro de completion
+  const functionCallStart = completion.indexOf('{"function_call":')
+  if (functionCallStart === -1) {
+    console.error("No se encontró 'function_call' en completion.")
+    return
+  }
+
+  const functionCallEnd = completion.lastIndexOf('}') + 1 // Buscar el último '}' para cerrar el JSON
+  if (functionCallEnd <= functionCallStart) {
+    console.error("No se pudo determinar el final del 'function_call' JSON.")
+    return
+  }
+
+  // Extraer y parsear solo el JSON de function_call
+  const completionObj = JSON.parse(completion.substring(functionCallStart, functionCallEnd))
+  const { name, arguments: args } = completionObj.function_call
+
+  let text = `Llamando a la función ${name}, datos: ${args}`
+
+  let gptData
+  if (name === "getDocument" || name === "getSection") {
+    const document = await getDocument(JSON.parse(args).docId)
+    if (typeof document !== "string") {
+      gptData = {
+        functionName: name,
+        docId: document.docId,
+        docName: document.docName,
+      }
+    }
+  } else if (name !== "getDateOfNow" && name !== "registrarPedido" && name !== "reservarSummit" && name !== "echoRegister" && name !== "completarFrase" && name !== "reservarServicio") {
+    const copyArgs = { ...JSON.parse(args) }
+    delete copyArgs.conversationId
+
+    gptData = {
+      functionName: name,
+      args: copyArgs
+    }
+  }
+  const messageStored = await messageArrived(phone, text, clientId, "function", gptData ? JSON.stringify(gptData) : "", 0, 0)
+  if (messageStored) console.log("function message stored")
 }

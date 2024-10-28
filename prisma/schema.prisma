@@ -287,6 +287,11 @@ model CarService {
 
 }
 
+enum ComClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model ComClient {
   id              String  @id @default(cuid())
   code            String                            // gennext: show.column
@@ -297,6 +302,8 @@ model ComClient {
   direccion       String?                            // gennext: show.column
   telefono        String?                            // gennext: show.column
   rutOrCI         String?                            // gennext: show.column
+
+  status          ComClientStatus  @default(ACTIVE)     // gennext: show.column
 
   client          Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId        String

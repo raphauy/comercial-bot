@@ -200,7 +200,7 @@ export async function getProductsByCategoryName(clientId: string, categoryName: 
 
   console.log(`\tgetProductsByCategoryName: ${result.length} productos encontrados`)
   result.forEach((product) => {
-    console.log(`\t\t${product.name}`)
+    console.log(`\t\t${product.name}, stock: ${product.stock}`)
   })  
 
   return result

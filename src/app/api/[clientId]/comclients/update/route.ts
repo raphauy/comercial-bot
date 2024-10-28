@@ -29,6 +29,9 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         const direccion= json.direccion
         const telefono= json.telefono
         const rutOrCI= json.rutOrCI
+        const status= json.status || "ACTIVE"
+
+        if (status !== "ACTIVE" && status !== "INACTIVE") return NextResponse.json({ error: "status is invalid, should be ACTIVE or INACTIVE" }, { status: 400 })
 
         const dataClient: ComClientFormValues = {
             clientId,
@@ -40,6 +43,7 @@ export async function POST(request: Request, { params }: { params: { clientId: s
             direccion,
             telefono,
             rutOrCI,
+            status
         };
         console.log(dataClient)
 

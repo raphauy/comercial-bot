@@ -137,3 +137,15 @@ export function decodeAndCorrectText(str: string): string {
 export function completeWithZeros(number: number): string {
   return number.toString().padStart(4, "0")
 }
+
+export function quitarTildes(str: string) {
+  // cambiar tildes por su equivalente sin tilde
+  const replacements: { [key: string]: string } = {
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+  }
+  Object.keys(replacements).forEach((key) => {
+    const value: string = replacements[key];
+    str = str.replace(new RegExp(key, 'g'), value);
+  })
+  return str
+}

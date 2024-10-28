@@ -139,18 +139,23 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
                     </AccordionItem>
                   </Accordion> :
                     <div className="w-full">
-                      <ReactMarkdown                        
-                        className="prose break-words prose-p:leading-relaxed dark:prose-invert"
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          // open links in new tab
-                          a: (props) => (
-                            <a {...props} target="_blank" rel="noopener noreferrer" />
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
+                      {
+                        // @ts-ignore
+                        message.role != "system" &&
+                        // message.role != "system" && message.role != "function" &&
+                        <ReactMarkdown                        
+                          className="prose break-words prose-p:leading-relaxed dark:prose-invert"
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            // open links in new tab
+                            a: (props) => (
+                              <a {...props} target="_blank" rel="noopener noreferrer" />
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      }
                     </div>
                 }
                 </div>

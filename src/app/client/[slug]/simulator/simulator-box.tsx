@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Textarea from "react-textarea-autosize";
 import remarkGfm from "remark-gfm";
+import GPTData from "../chats/gpt-data";
 
 export default function SimulatorBox() {
   const params= useParams()
@@ -206,61 +207,83 @@ export default function SimulatorBox() {
         }
       </div>
 
-      <div className="w-full max-w-3xl mt-5 ">
+      <div className="w-full max-w-3xl mt-5">
         {messages.length > 0 ? (
-          messages.map((message, i) => (
-            <div
-              key={i}
-              className={clsx(
-                "flex w-full px-1 items-center justify-center border-b border-gray-200 py-4",
-                message.role === "user" ? "bg-gray-100 dark:bg-gray-800" : "bg-background",
-              )}
-            >
-              <div className="flex items-start w-full max-w-screen-md px-5 space-x-4 sm:px-0">
-                <div
-                  className={clsx(
-                    "p-1.5 text-white",
-                    (message.role === "assistant" || message.role === "function") ? "bg-green-500" : message.role === "system" ? "bg-blue-500" : "bg-black",
-                  )}
-                >
-                {message.role === "user" ? (
-                <User width={20} />
-                ) : message.role === "system" || message.role === "function" ? (
-                <Terminal width={20} />
-                ) : (
-                <Bot width={20} />
-                )
+          messages.map((message, i) => {
+            // @ts-ignore
+            const gptData= message.gptData
+            return(
+            <div key={i} className="w-full">
+              <div
+                className={clsx(
+                  "flex w-full px-1 items-center justify-center border-gray-200 py-4",
+                  message.role === "user" ? "bg-gray-100 dark:bg-gray-800" : "bg-background",
+                )}
+              >
+                <div className="flex items-start w-full max-w-screen-md px-5 space-x-4 sm:px-0">
+                  {
+                    !gptData &&
+                      <div
+                        className={clsx(
+                          "p-1.5 text-white",
+                          (message.role === "assistant") ? "bg-green-500" : (message.role === "system" || message.role === "function") ? "bg-blue-500" : "bg-black",
+                        )}
+                      >
+                      {message.role === "user" ? (
+                      <User width={20} />
+                      ) : message.role === "system" ? (
+                      <Terminal width={20} />
+                      ) : (message.role === "function" && !gptData) ? (
+                      <Terminal width={20}/>
+                      ) : message.role === "assistant" ? (
+                      <Bot width={20} />
+                      ) : 
+                      <></>
+                      }
+
+                    </div>
+                  }
+                  {
+                    message.role !== "system"  && !gptData &&
+                    <ReactMarkdown
+                      className="w-full mt-1 prose break-words prose-p:leading-relaxed dark:prose-invert"
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        // open links in new tab
+                        a: (props) => (
+                          <a {...props} target="_blank" rel="noopener noreferrer" />
+                        ),
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>            
+                  }
+
+
+                </div>                         
+                {
+                  // @ts-ignore
+                  message.promptTokens > 0 && (
+                    <div className="grid p-2 text-right border rounded-md">
+                      {/** @ts-ignore */}
+                      <p className="whitespace-nowrap">{Intl.NumberFormat("es-UY").format(message.promptTokens)} pt</p>
+                      {/** @ts-ignore */}
+                      <p>{Intl.NumberFormat("es-UY").format(message.completionTokens)} ct</p>
+                    </div>
+                  )
                 }
 
-                </div>
-                {message.role !== "system" &&
-                  <ReactMarkdown
-                    className="w-full mt-1 prose break-words prose-p:leading-relaxed dark:prose-invert"
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      // open links in new tab
-                      a: (props) => (
-                        <a {...props} target="_blank" rel="noopener noreferrer" />
-                      ),
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>            
-                }
-              </div>                         
-              {
-                // @ts-ignore
-                message.promptTokens > 0 && (
-                  <div className="grid p-2 text-right border rounded-md">
-                    {/** @ts-ignore */}
-                    <p className="whitespace-nowrap">{Intl.NumberFormat("es-UY").format(message.promptTokens)} pt</p>
-                    {/** @ts-ignore */}
-                    <p>{Intl.NumberFormat("es-UY").format(message.completionTokens)} ct</p>
-                  </div>
+              </div>
+              { 
+                gptData && isAdmin && (
+                  // @ts-ignore
+                  <div className="mb-6"><GPTData gptData={message.gptData} slug={slug} /></div>
                 )
-              }
+              }              
             </div>
-          ))
+
+            
+          )})
         ) : client?.nombre && (
           <div className="max-w-screen-md mx-5 border rounded-md border-gray-200sm:mx-0 sm:w-full">
             <div className="flex flex-col space-y-4 p-7 sm:p-10">
@@ -275,7 +298,8 @@ export default function SimulatorBox() {
         )}
       </div>
 
-      {error && <p className="mt-10 text-base text-center text-red-500">{JSON.parse(error.message).error}</p>}
+
+      {error && <p className="mt-10 text-base text-center text-red-500">Ocurrió un error</p>}
 
       <div className="fixed bottom-0 flex flex-col items-center w-full p-5 pb-3 space-y-3 max-w-[350px] sm:max-w-[400px] md:max-w-[550px] lg:max-w-screen-md sm:px-0">
         <form
