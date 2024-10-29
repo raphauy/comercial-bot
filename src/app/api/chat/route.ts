@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const messages= origMessages.filter((message: any) => message.role !== "system")
   // replace role function by system
   for (let i = 0; i < messages.length; i++) {
-    if (messages[i].role === "function") {
+    if (messages[i].role === "function" || messages[i].role === "tool") {
       messages[i].role = "system"
     }
   }

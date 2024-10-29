@@ -37,12 +37,16 @@ const getProductsByName=
         "parameters": {
         "type": "object",
         "properties": {
+            "conversationId": {
+                "type": "string",
+                "description": "Identificador de la conversación que va en el prompt."
+            },
             "name": {
                 "type": "string",
                 "description": "Nombre o parte del nombre del producto"
             }
         },
-        "required": ["name"]
+        "required": ["conversationId", "name"]
     }
 }
 
@@ -339,7 +343,7 @@ const addItemToOrder=
         "properties": {
             "orderId": {
                 "type": "string",
-                "description": "Identificador del pedido. Si se quiere crear un nuevo pedido, se debe utilizar el valor 'new'"
+                "description": "Identificador del pedido. Si se quiere crear un nuevo pedido, se debe utilizar el valor 'new' pero solo se puede crear si el cliente no tiene ningún pedido en estado 'Ordering'"
             },
             "comClientId": {
                 "type": "string",
@@ -347,7 +351,7 @@ const addItemToOrder=
             },
             "productCode": {
                 "type": "string",
-                "description": "Código del producto"
+                "description": "Código del producto. No puedes inventar este código, si no lo sabes, utiliza la función getProductsByName para buscar el código del producto"
             },
             "quantity": {
                 "type": "string",
@@ -469,7 +473,7 @@ const addBulkItemsToOrder =
                     "properties": {
                         "productCode": {
                             "type": "string",
-                            "description": "Código del producto"
+                            "description": "Código del producto. No puedes inventar este código, si no lo sabes, utiliza la función getProductsByName para buscar el código del producto"
                         },
                         "quantity": {
                             "type": "string",

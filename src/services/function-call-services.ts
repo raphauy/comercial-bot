@@ -1,4 +1,4 @@
-import { Client, ComClientStatus } from "@prisma/client";
+import { Client, ComClientStatus, OrderStatus } from "@prisma/client";
 import OpenAI from "openai";
 import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { CompletionInitResponse, notifyAgentes, notifyLead, notifyPedido, processFunctionCall } from "./functions";
@@ -160,10 +160,14 @@ export async function getContext(clientId: string, phone: string) {
       telefono: ${comClient.telefono}
     }\n`
     contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
+    let orderingOrderId= null
     const pendingOrders= await getTodayOrdersDAOByComClient(comClient.id)
     if (pendingOrders.length > 0) {
       contextString+= `El usuario tine los siguientes pedidos:\n`
       pendingOrders.map((order) => {
+        if (order.status === OrderStatus.Ordering) {
+          orderingOrderId= order.id
+        }
         contextString+= `{
           orderId: "${order.id}",
           orderNumber: "#${completeWithZeros(order.orderNumber)}",
@@ -181,6 +185,9 @@ export async function getContext(clientId: string, phone: string) {
         contextString+= "],\n"
         contextString+= "},\n"
       })
+    }
+    if (orderingOrderId) {
+      contextString+= `El usuario tiene un pedido en estado 'Ordering'. Antes de crear un nuevo pedido, se debe confirmar o cancelar el pedido existente. Para añadir productos al pedido, utiliza el identificador del pedido(orderId): ${orderingOrderId}\n`
     }
   }
 

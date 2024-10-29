@@ -141,7 +141,7 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
                     <div className="w-full">
                       {
                         // @ts-ignore
-                        message.role != "system" &&
+                        message.role != "system" && message.role != "tool" &&
                         // message.role != "system" && message.role != "function" &&
                         <ReactMarkdown                        
                           className="prose break-words prose-p:leading-relaxed dark:prose-invert"

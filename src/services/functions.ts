@@ -6,6 +6,7 @@ import { addBulkItemsToOrderImpl, addItemToOrderImpl, cancelOrderImpl, changeQua
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { getSectionOfDocument } from "./section-services";
 import { SummitFormValues, createSummit } from "./summit-services";
+import { getConversation, messageArrived } from "./conversationService";
 
 export type CompletionInitResponse = {
   assistantResponse: string | null
@@ -130,7 +131,7 @@ export async function completarFrase(clientId: string, conversationId: string, t
 
 }
 
-export async function getProductsByName(clientId: string, name: string) {
+export async function getProductsByName(clientId: string, conversationId: string, name: string) {
   console.log("getProductsByName")
   console.log(`\tname: ${name}`)
   
@@ -140,9 +141,24 @@ export async function getProductsByName(clientId: string, name: string) {
   console.log(`\tgetProductsByName: ${result.length} productos encontrados`)
   // log name and distance of each product
   result.forEach((product) => {
-    console.log(`\t\t${product.nombre} - ${product.vectorDistance}`)
+    console.log(`\t\t${product.nombre} - code: ${product.codigo} - ${product.vectorDistance}`)
   })
+
+  if (!conversationId) {
+    return "Error, conversationId is required"
+  }
+  const conversation= await getConversation(conversationId)
+  if (!conversation) {
+    return "Error, conversation not found"
+  }
+  const phone= conversation.phone
+  const text= `
+functionName: getProductsByName,
+args: ${name},
+result: ${JSON.stringify(result)}
+`
   
+  await messageArrived(phone, text, clientId, "tool", "", 0, 0)
 
   return result
 }
@@ -604,7 +620,7 @@ export async function processFunctionCall(clientId: string, name: string, args: 
       break
 
     case "getProductsByName":
-      content= await getProductsByName(clientId, args.name)
+      content= await getProductsByName(clientId, args.conversationId, args.name)
       break
 
     case "getClientByCode":

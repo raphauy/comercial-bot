@@ -208,10 +208,10 @@ export async function processMessage(id: string, modelName?: string) {
   const messages: ChatCompletionMessageParam[]= getGPTMessages(filteredMessages as ChatCompletionUserOrSystem[], systemMessage)
   // replace role function by system
   for (let i = 0; i < messages.length; i++) {
-    if (messages[i].role === "function") {
+    if (messages[i].role === "function" || messages[i].role === "tool") {
       messages[i].role = "system"
     }
-  }  
+  }
 
   const created= await messageArrived(conversation.phone, systemMessage.content, client.id, "system", "")
   //await setSectionsToMessage(created.id, contextResponse.sectionsIds)

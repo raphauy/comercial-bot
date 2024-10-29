@@ -16,7 +16,7 @@ export async function createOrUpdateOrderAction(id: string | null, data: OrderFo
         updated= await createOrder(data)
     }     
 
-    revalidatePath("/[slug]/orders")
+    revalidatePath("/[slug]/orders", "page")
 
     return updated as OrderDAO
 }
@@ -24,7 +24,7 @@ export async function createOrUpdateOrderAction(id: string | null, data: OrderFo
 export async function deleteOrderAction(id: string): Promise<OrderDAO | null> {    
     const deleted= await deleteOrder(id)
 
-    revalidatePath("/[slug]/orders")
+    revalidatePath("/[slug]/orders", "page")
 
     return deleted as OrderDAO
 }

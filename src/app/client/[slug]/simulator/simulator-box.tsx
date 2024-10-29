@@ -222,7 +222,7 @@ export default function SimulatorBox() {
               >
                 <div className="flex items-start w-full max-w-screen-md px-5 space-x-4 sm:px-0">
                   {
-                    !gptData &&
+                    !gptData && message.role !== "tool" &&
                       <div
                         className={clsx(
                           "p-1.5 text-white",
@@ -244,7 +244,7 @@ export default function SimulatorBox() {
                     </div>
                   }
                   {
-                    message.role !== "system"  && !gptData &&
+                    message.role !== "system" && message.role !== "tool" && !gptData &&
                     <ReactMarkdown
                       className="w-full mt-1 prose break-words prose-p:leading-relaxed dark:prose-invert"
                       remarkPlugins={[remarkGfm]}
