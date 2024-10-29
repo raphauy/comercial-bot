@@ -2,7 +2,7 @@ import { decodeAndCorrectText } from "@/lib/utils";
 import { clientSimilaritySearch, getBuyersOfProductByCategoryImpl, getBuyersOfProductByCodeImpl, getBuyersOfProductByRankingImpl, getClientsByDepartamentoImpl, getClientsByLocalidadImpl, getComClientDAOByCode, getFullComClientsDAOByVendor, getTopBuyersByDepartamentoAndVendorImpl, getTopBuyersByDepartamentoImpl, getTopBuyersImpl } from "./comclient-services";
 import { getDocumentDAO } from "./document-services";
 import { LeadFormValues, createLead } from "./lead-services";
-import { addBulkItemsToOrderImpl, addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, removeItemFromOrderImpl } from "./order-services";
+import { addBulkItemsToOrderImpl, addItemToOrderImpl, cancelOrderImpl, changeQuantityOfItemInOrderImpl, confirmOrderImpl, getAmountOfOrdersOrdering, removeItemFromOrderImpl } from "./order-services";
 import { getFullProductDAOByCategoryName, getFullProductDAOByCode, getFullProductDAOByRanking, getProductsRecomendationsForClientImpl, productSimilaritySearch } from "./product-services";
 import { getSectionOfDocument } from "./section-services";
 import { SummitFormValues, createSummit } from "./summit-services";
@@ -429,6 +429,11 @@ export async function addItemToOrder(clientId: string, orderId: string, comClien
   }
 
   try {
+    const amountOfOrdersOrdering= await getAmountOfOrdersOrdering(comClientId)
+    if (orderId !== "new" && amountOfOrdersOrdering > 0) {
+      return "El cliente ya tiene un pedido en estado 'Ordering'. Se debe agregar el producto al pedido existente o confirmar o cancelar el pedido antes de crear uno nuevo."
+    }
+
     const order= await addItemToOrderImpl(clientId, orderId, comClientId, productCode, Number(quantity))
     if (!order) return "Error al agregar el producto a la orden"
   
@@ -439,8 +444,7 @@ export async function addItemToOrder(clientId: string, orderId: string, comClien
       
   } catch (error) {
     console.log(error)
-    return error
-    
+    return "Error al agregar el producto a la orden"    
   }
 }
 

@@ -164,10 +164,6 @@ export async function addItemToOrderImpl(clientId: string, orderId: string, comC
 
   let order
   if (orderId === "new") {
-    const amountOfOrdersOrdering= await getAmountOfOrdersOrdering(comClientId)
-    if (amountOfOrdersOrdering > 0) {
-      throw new Error("El cliente ya tiene un pedido en estado 'Ordering'. Se debe confirmar o cancelar el pedido antes de crear uno nuevo.")
-    }
     // Crear nueva orden
     const orderNumber = await getLastOrderNumber(clientId) + 1
     order = await prisma.order.create({
