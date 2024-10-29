@@ -3,7 +3,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import clsx from "clsx"
 import { Bot, Car, CircleDollarSign, Magnet, Terminal, Ticket, User } from "lucide-react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
@@ -14,6 +13,7 @@ import GPTData from "./gpt-data"
 import { useEffect, useState } from "react"
 import { CustomInfo, getCustomInfoAction } from "@/app/admin/chat/actions"
 import { useParams } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 interface Props {
   conversation: DataConversation
@@ -103,16 +103,16 @@ export default function ConversationBox({ conversation, promptTokensPrice, compl
         {
           messages.map((message, i) => (
             <div key={i} className="w-full">
-              <div className={clsx(
+              <div className={cn(
                   "flex w-full items-center justify-between px-1 lg:px-4 border-b border-gray-200 py-5",
                   message.role === "user" ? "bg-gray-100 dark:bg-gray-800" : "bg-background",
                 )}
               >
                 <div className="flex items-center w-full max-w-screen-md px-5 space-x-4 sm:px-0">
-                  <div className="flex flex-col">
+                  <div className={cn("flex flex-col", message.role === "tool" ? "hidden" : "")}>
                     <div
-                        className={clsx(
-                        "p-1.5 text-white flex justify-center",
+                        className={cn(
+                        "p-1.5 text-white flex justify-center", 
                         (message.role === "assistant" || message.role === "function") ? "bg-green-500" : message.role === "system" ? "bg-blue-500" : "bg-black",
                         )}
                     >
