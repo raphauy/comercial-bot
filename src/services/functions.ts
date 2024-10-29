@@ -430,7 +430,7 @@ export async function addItemToOrder(clientId: string, orderId: string, comClien
 
   try {
     const amountOfOrdersOrdering= await getAmountOfOrdersOrdering(comClientId)
-    if (orderId !== "new" && amountOfOrdersOrdering > 0) {
+    if (orderId === "new" && amountOfOrdersOrdering > 0) {
       console.log(`\tamountOfOrdersOrdering: ${amountOfOrdersOrdering}`)
       return "No se pudo agregar el producto a la orden. El cliente ya tiene un pedido en estado 'Ordering'. Se debe agregar el producto al pedido existente (el id está en el prompt) o confirmar o cancelar el pedido antes de crear uno nuevo."
     }
