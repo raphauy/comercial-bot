@@ -438,9 +438,8 @@ export async function addItemToOrder(clientId: string, orderId: string, comClien
     return JSON.stringify(order)
       
   } catch (error) {
-    console.log("Error al agregar el producto a la orden")
     console.log(error)
-    return "Error al agregar el producto a la orden"
+    return error
     
   }
 }
