@@ -7,6 +7,7 @@ import { ArrowUpDown, Phone } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { DeleteComClientDialog, ComClientDialog } from "./comclient-dialogs"
 import { es } from "date-fns/locale"
+import { cn } from "@/lib/utils"
 
 
 export const columns: ColumnDef<ComClientDAO>[] = [
@@ -111,6 +112,19 @@ export const columns: ColumnDef<ComClientDAO>[] = [
 		cell: ({ row }) => {
       const data= row.original
       return (<p>{formatDistanceToNow(data.updatedAt, {locale: es})}</p>) 
+    }
+  },
+
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (<p>Status</p>)
+    },
+    cell: ({ row }) => {
+      const data= row.original
+      return (
+        <p className={cn("text-xs", data.status === "ACTIVE" ? "text-green-500" : "text-red-500")}>{data.status}</p>
+      )
     }
   },
 

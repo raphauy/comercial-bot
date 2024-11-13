@@ -113,11 +113,9 @@ export async function getContext(clientId: string, phone: string) {
 
   let contextString= "Hablas correctamente el español, incluyendo el uso adecuado de tildes y eñes.\nPor favor, utiliza solo caracteres compatibles con UTF-8 y adecuados para el idioma español.\n"
 
-  if (functionsNames.includes("insertLead") || functionsNames.includes("echoRegister")) {
-    const conversation= await getActiveConversation(phone, clientId)
-    if (conversation) {
-      contextString+= "\nconversationId: " + conversation.id + "\n"
-    }
+  const conversation= await getActiveConversation(phone, clientId)
+  if (conversation) {
+    contextString+= "\nconversationId: " + conversation.id + "\n"
   }
 
   if (functionsNames.includes("getDateOfNow")) {

@@ -133,6 +133,8 @@ export async function completarFrase(clientId: string, conversationId: string, t
 
 export async function getProductsByName(clientId: string, conversationId: string, name: string) {
   console.log("getProductsByName")
+  console.log(`\tclientId: ${clientId}`)
+  console.log(`\tconversationId: ${conversationId}`)
   console.log(`\tname: ${name}`)
   
   const result= await productSimilaritySearch(clientId, name)
