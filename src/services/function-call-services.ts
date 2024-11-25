@@ -1,16 +1,16 @@
-import { Client, ComClientStatus, OrderStatus } from "@prisma/client";
+import { Client, ComClient, ComClientStatus, OrderStatus } from "@prisma/client";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import OpenAI from "openai";
 import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { getFunctionsOfClient } from "./clientService";
+import { getComClientsDAOByPhone } from "./comclient-services";
+import { getActiveConversation, saveFunction } from "./conversationService";
+import { getDocumentsDAOByClient } from "./document-services";
 import { CompletionInitResponse, notifyAgentes, notifyLead, notifyPedido, processFunctionCall } from "./functions";
 import { getFullModelDAO } from "./model-services";
-import { getActiveConversation, saveFunction } from "./conversationService";
-import { getFunctionsOfClient } from "./clientService";
-import { format } from "date-fns";
-import { getDocumentsDAOByClient } from "./document-services";
-import { getComClientDAOByPhone } from "./comclient-services";
 import { getTodayOrdersDAOByComClient } from "./order-services";
 import { completeWithZeros } from "@/lib/utils";
-import { es } from "date-fns/locale";
 
 const MAX_RECURSIONS = 10;
 
@@ -141,27 +141,59 @@ export async function getContext(clientId: string, phone: string) {
 
   }
 
-  const comClient= await getComClientDAOByPhone(clientId, phone)
+  const comClients= await getComClientsDAOByPhone(clientId, phone)
   contextString+= "\n**** Datos del usuario ****\n"
-  contextString+= `Phone: ${phone}\n`
-  if (!comClient || comClient.status === ComClientStatus.INACTIVE) {
+  contextString+= await getComClientsString(phone, comClients)
+
+  contextString+= "\n***************************\n"
+
+  if (functionsNames.includes("insertLead")) {
+    if (comClients.length === 0 || !comClients.some((comClient) => comClient.status === ComClientStatus.ACTIVE)) {
+      contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
+    }
+  }
+
+  if (functionsNames.includes("addItemToOrder")) {
+    // contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
+  }
+
+
+  return contextString
+}
+
+
+async function getComClientsString(phone: string, comClients: ComClient[]) {
+  let contextString= `Phone: ${phone}\n`
+
+  if (comClients.length === 0) {
     contextString+= "No se encontró ningún cliente con el número de teléfono: " + phone + ".\n"
+    return contextString
+  }
+
+  if (comClients.length === 1 && comClients[0].status === ComClientStatus.ACTIVE) {
+    contextString+= `Saludar al usuario indicando que los pedidos son para: ${comClients[0].name}.\n`
+  } else if (comClients.length > 1 && comClients.some((comClient) => comClient.status === ComClientStatus.ACTIVE)) {
+    contextString+= "El usuario está autorizado a hacer pedidos para más de un cliente. \n" 
+    contextString+= "Cuando el usuario quiera hacer un pedido, debes preguntar por el cliente al que desea hacer el pedido.\n"
+    contextString+= "Clientes activos:\n"
   } else {
-    contextString+= `El usuario es un cliente (comClient), estos son sus datos:\n`
+    contextString+= "El usuario no está asociado a ningún cliente activo.\n"
+    return contextString
+  }
+
+  let index= 1
+  for (const comClient of comClients) {
+    contextString+= `-------\n`
+    contextString+= `${index})\n`
+    index++
     contextString+= `{
+      comClientName: "${comClient.name}",
       comClientId: "${comClient.id}",
-      nombre: ${comClient.name},
-      codigo: ${comClient.code},
-      departamento: ${comClient.departamento},
-      localidad: ${comClient.localidad},
-      direccion: ${comClient.direccion},
-      telefono: ${comClient.telefono}
-    }\n`
-    contextString+= `Saludar al cliente por su nombre: ${comClient.name}.\n`
+}\n`
     let orderingOrderId= null
     const pendingOrders= await getTodayOrdersDAOByComClient(comClient.id)
     if (pendingOrders.length > 0) {
-      contextString+= `El usuario tine los siguientes pedidos:\n`
+      contextString+= `El cliente ${comClient.name} tiene los siguientes pedidos:\n`
       pendingOrders.map((order) => {
         if (order.status === OrderStatus.Ordering) {
           orderingOrderId= order.id
@@ -185,22 +217,12 @@ export async function getContext(clientId: string, phone: string) {
       })
     }
     if (orderingOrderId) {
-      contextString+= `El usuario tiene un pedido en estado 'Ordering'. Antes de crear un nuevo pedido, se debe confirmar o cancelar el pedido existente. Para añadir productos al pedido, utiliza el identificador del pedido(orderId): ${orderingOrderId}\n`
+      contextString+= `El usuario tiene un pedido en estado 'Ordering'. Antes de continuar debes preguntarle si quiere confirmar o cancelar el pedido existente.\n`      
+      contextString+= `Opcionalmente, el usuario puede continuar agregando productos al pedido abierto (Ordering).Para añadir productos al pedido, utiliza el identificador del pedido(orderId): ${orderingOrderId}\n`
+      contextString+= `No se puede crear un nuevo pedido si el usuario tiene un pedido en estado 'Ordering'.\n`
+      contextString+= `Antes de preguntar por la confirmación del pedido, debes agregar los productos al pedido abierto (Ordering) si el usuario lo desea.\n`  
     }
   }
-
-  contextString+= "\n***************************\n"
-
-  if (functionsNames.includes("insertLead")) {
-    if (!comClient) {
-      contextString+= "El usuario es un potencial lead. Invitarlo a registrarse y utilizar la función insertLead.\n"
-    }
-  }
-
-  if (functionsNames.includes("addItemToOrder")) {
-    // contextString+= "Recuerda que solo se crean pedidos nuevos si el usuario no tiene pedidos Ordering.\n"
-  }
-
 
   return contextString
 }

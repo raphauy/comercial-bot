@@ -1,15 +1,7 @@
-import * as z from "zod"
 import { prisma } from "@/lib/db"
-import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { Client } from "@prisma/client"
-import { getDocumentsDAOByClient } from "./document-services"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-import { getActiveConversation } from "./conversationService"
-import { getFunctionsOfClient } from "./clientService"
-import { getComClientDAOByPhone } from "./comclient-services"
-import { getTodayOrdersDAOByComClient } from "./order-services"
-import { completeWithZeros } from "@/lib/utils"
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import * as z from "zod"
 
 export type FunctionDAO = {
 	id: string

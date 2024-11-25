@@ -315,8 +315,8 @@ export async function getComClientDAOByCode(clientId: string, code: string) {
   
 }
 
-export async function getComClientDAOByPhone(clientId: string, phone: string) {
-  let found = await prisma.comClient.findFirst({
+export async function getComClientsDAOByPhone(clientId: string, phone: string) {
+  let found = await prisma.comClient.findMany({
     where: {
       clientId,
       telefono: {

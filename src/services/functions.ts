@@ -482,8 +482,8 @@ export async function cancelOrder(clientId: string, orderId: string, note: strin
   console.log(`\torderId: ${orderId}`)
   console.log(`\tnote: ${note}`)
 
-  if (!orderId || !note) {
-    return "Parámetros incorrectos, orderId y note son obligatorios"
+  if (!orderId) {
+    return "Parámetros incorrectos, orderId es obligatorio"
   }
 
   try {
