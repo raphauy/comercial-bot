@@ -60,31 +60,33 @@ export async function getConversationsOfClient(clientId: string) {
 }
 
 
-// an active conversation is one that has a message in the last 10 minutes
+// an active conversation is one that has a message in the last x minutes
 export async function getActiveConversation(phone: string, clientId: string) {
+
+  const minutes= 60
     
-    const found = await prisma.conversation.findFirst({
-      where: {
-        phone,
-        clientId,
-        closed: false,
-        messages: {
-          some: {
-            createdAt: {
-              gte: new Date(Date.now() - 10 * 60 * 1000)
-            }
+  const found = await prisma.conversation.findFirst({
+    where: {
+      phone,
+      clientId,
+      closed: false,
+      messages: {
+        some: {
+          createdAt: {
+            gte: new Date(Date.now() - minutes * 60 * 1000)
           }
         }
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        client: true
       }
-    })
-  
-    return found;
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      client: true
+    }
+  })
+
+  return found;
 }
 
 export async function getActiveMessages(phone: string, clientId: string) {
