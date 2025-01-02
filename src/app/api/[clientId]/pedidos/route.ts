@@ -40,7 +40,7 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         return NextResponse.json( data, { status: 200 })
 
     } catch (error) {
-        return NextResponse.json({ error: "error: " + error}, { status: 502 })        
+        return NextResponse.json({ error: "" + error as string }, { status: 500 })        
     }
    
 }
