@@ -52,6 +52,7 @@ export async function POST(request: Request, { params }: { params: { clientId: s
         return NextResponse.json( { "data": updated }, { status: 200 })
 
     } catch (error) {
+        console.log("error: ", error)
         return NextResponse.json({ error: "error: " + error}, { status: 502 })        
     }
    
